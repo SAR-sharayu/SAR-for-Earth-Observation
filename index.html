@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SAR for Earth Observation — Interactive Curriculum & Lab</title>
+  <title>Synthetic Aperture Radar for Earth Observation — Interactive Course by Sharayu</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,18 +28,13 @@
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.3); border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.5); }
-    .mindmap-line { stroke-dasharray: 4 4; animation: dash 20s linear infinite; }
-    @keyframes dash { to { stroke-dashoffset: -100; } }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-cyan-500 selection:text-slate-950 overflow-x-hidden">
 
   <!-- Top Navbar -->
-  <header class="sticky top-0 z-40 h-16 border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-md px-4 lg:px-6 flex items-center justify-between">
+  <header class="sticky top-0 z-40 h-16 border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-md px-4 lg:px-8 flex items-center justify-between">
     <div class="flex items-center gap-3">
-      <button id="mobileMenuBtn" class="lg:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition" aria-label="Toggle Sidebar">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-      </button>
       <a href="#view-overview" id="brandLink" class="flex items-center gap-3 group">
         <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
           <svg class="w-5 h-5 text-slate-950" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
@@ -49,452 +44,451 @@
         <div>
           <span class="font-bold tracking-tight text-white text-base sm:text-lg flex items-center gap-2">
             SAR<span class="text-cyan-400">EO</span>
-            <span class="hidden sm:inline-block text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">Static HTML Portal</span>
+            <span class="hidden sm:inline-block text-[11px] font-medium text-slate-400 border-l border-slate-800 pl-2.5">by Sharayu</span>
           </span>
-          <p class="text-xs text-slate-400 hidden sm:block">Synthetic Aperture Radar &amp; InSAR Interactive Curriculum</p>
+          <p class="text-xs text-slate-400 hidden sm:block">Microwave Remote Sensing &amp; InSAR for Earth Observation</p>
         </div>
       </a>
     </div>
 
     <!-- Top Navigation Tabs -->
-    <nav class="hidden md:flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800">
-      <button data-nav="overview" class="nav-tab px-3.5 py-1.5 rounded-lg text-xs font-medium transition bg-cyan-500 text-slate-950 font-semibold">
-        Curriculum &amp; Mind Map
+    <nav class="flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800">
+      <button data-nav="overview" class="nav-tab px-4 py-1.5 rounded-lg text-xs font-medium transition bg-cyan-500 text-slate-950 font-semibold">
+        Contents
       </button>
-      <button data-nav="lesson" class="nav-tab px-3.5 py-1.5 rounded-lg text-xs font-medium transition text-slate-300 hover:text-white">
-        Interactive Lessons (28)
-      </button>
-      <button data-nav="gaps" class="nav-tab px-3.5 py-1.5 rounded-lg text-xs font-medium transition text-slate-300 hover:text-white">
-        Missing Topics (8)
-      </button>
-      <button data-nav="github" class="nav-tab px-3.5 py-1.5 rounded-lg text-xs font-medium transition text-slate-300 hover:text-white">
-        GitHub Pages Setup
+      <button data-nav="lesson" class="nav-tab px-4 py-1.5 rounded-lg text-xs font-medium transition text-slate-300 hover:text-white">
+        Interactive Lessons
       </button>
     </nav>
 
     <!-- Right Controls -->
-    <div class="flex items-center gap-2.5">
-      <div class="hidden sm:flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5">
-        <span class="text-xs text-slate-400">Progress:</span>
+    <div class="flex items-center gap-3">
+      <div class="hidden md:flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5">
+        <span class="text-xs text-slate-400">Completed:</span>
         <span id="progressBadge" class="text-xs font-mono font-semibold text-emerald-400">0 / 28</span>
       </div>
-      <button id="openGithubModalBtn" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1.5">
-        <svg class="w-4 h-4 text-cyan-400" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
-        <span class="hidden sm:inline">Push to GitHub</span>
-      </button>
     </div>
   </header>
 
-  <!-- Mobile Secondary Nav -->
-  <div class="md:hidden flex items-center gap-1 bg-slate-900/95 px-3 py-2 border-b border-slate-800 overflow-x-auto">
-    <button data-nav="overview" class="nav-tab px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap bg-cyan-500 text-slate-950 font-semibold">Mind Map</button>
-    <button data-nav="lesson" class="nav-tab px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap text-slate-300">Lessons (28)</button>
-    <button data-nav="gaps" class="nav-tab px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap text-slate-300">Missing (8)</button>
-    <button data-nav="github" class="nav-tab px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap text-slate-300">GitHub Guide</button>
-  </div>
+  <!-- Main Workspace Container (Full-width centered without redundant left sidebar) -->
+  <main class="flex-1 min-w-0 p-4 sm:p-6 lg:p-10 max-w-6xl mx-auto w-full">
 
-  <!-- Main Workspace Container -->
-  <div class="flex-1 flex relative">
+    <!-- VIEW 1: CONTENTS & EARTH OBSERVATION COURSE LANDING PAGE -->
+    <section id="view-overview" class="space-y-12">
 
-    <!-- Left Curriculum Sidebar -->
-    <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-30 w-80 bg-slate-900/95 lg:bg-slate-900/60 border-r border-slate-800/80 flex flex-col transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out pt-16 lg:pt-0">
-      <!-- Search & Filter -->
-      <div class="p-3.5 border-b border-slate-800/80 space-y-2.5">
-        <div class="relative">
-          <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-          <input id="searchInput" type="text" placeholder="Search 28 lessons or HTML files..." class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-lg pl-9 pr-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none">
+      <!-- Course Hero Banner -->
+      <div class="rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-cyan-950/40 border border-slate-800 p-6 sm:p-10 relative overflow-hidden">
+        <div class="max-w-3xl space-y-4 relative z-10">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-medium">
+            <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+            Interactive Earth Observation Curriculum • Curated by Sharayu
+          </div>
+          <h1 class="text-2xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight leading-tight">
+            Synthetic Aperture Radar for Earth Observation
+          </h1>
+          <p class="text-sm sm:text-base text-slate-300 leading-relaxed">
+            Learn how spaceborne imaging radars see through clouds and darkness to map our changing planet. This interactive course guides you from electromagnetic wave physics and synthetic aperture focusing to Sentinel-1 TOPS co-registration, SAR Interferometry (InSAR), and millimeter-scale tectonic and climate monitoring.
+          </p>
+          <div class="flex flex-wrap items-center gap-3 pt-2">
+            <button id="startFirstLessonBtn" class="px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold text-xs sm:text-sm transition shadow-lg shadow-cyan-500/20 flex items-center gap-2">
+              <span>Start Chapter 1</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+            </button>
+            <a href="#course-contents" class="px-4 py-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-800 text-slate-200 font-medium text-xs sm:text-sm border border-slate-700 transition">
+              Browse Course Contents
+            </a>
+            <a href="#satellite-missions" class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 font-medium text-xs sm:text-sm border border-slate-800 transition">
+              Explore SAR Satellite Missions
+            </a>
+          </div>
         </div>
-        <div class="flex items-center gap-1.5">
-          <button data-filter="all" class="filter-chip flex-1 py-1 rounded-md text-[11px] font-medium bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">All (28)</button>
-          <button data-filter="have" class="filter-chip flex-1 py-1 rounded-md text-[11px] font-medium bg-slate-800 text-slate-400 hover:text-slate-200 border border-transparent">Ready (20)</button>
-          <button data-filter="missing" class="filter-chip flex-1 py-1 rounded-md text-[11px] font-medium bg-slate-800 text-slate-400 hover:text-slate-200 border border-transparent">To Build (8)</button>
+
+        <!-- Scientific Key Figures Row -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 mt-8 pt-6 border-t border-slate-800/80">
+          <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-3.5">
+            <div class="text-xs text-slate-400">All-Weather Imaging</div>
+            <div class="text-lg sm:text-xl font-bold text-white mt-0.5">24/7 Day &amp; Night</div>
+            <div class="text-[11px] text-cyan-400 mt-1">Penetrates clouds, smoke &amp; rain</div>
+          </div>
+          <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-3.5">
+            <div class="text-xs text-slate-400">InSAR Precision</div>
+            <div class="text-lg sm:text-xl font-bold text-emerald-400 mt-0.5">Millimeter Scale</div>
+            <div class="text-[11px] text-slate-400 mt-1">Tracks faults, volcanoes &amp; subsidence</div>
+          </div>
+          <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-3.5">
+            <div class="text-xs text-slate-400">Microwave Spectrum</div>
+            <div class="text-lg sm:text-xl font-bold text-amber-400 mt-0.5">X, C, L &amp; P Bands</div>
+            <div class="text-[11px] text-slate-400 mt-1">3 cm to 70 cm radar wavelengths</div>
+          </div>
+          <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-3.5">
+            <div class="text-xs text-slate-400">Course Structure</div>
+            <div class="text-lg sm:text-xl font-bold text-indigo-400 mt-0.5">6 Chapters</div>
+            <div class="text-[11px] text-slate-400 mt-1">28 interactive signal &amp; InSAR labs</div>
+          </div>
         </div>
       </div>
 
-      <!-- Chapters Accordion List -->
-      <div id="chapterList" class="flex-1 overflow-y-auto p-3 space-y-3"></div>
+      <!-- SECTION A: WHAT IS SYNTHETIC APERTURE RADAR & HOW SATELLITES USE IT -->
+      <div class="space-y-5">
+        <div>
+          <span class="text-xs font-mono uppercase tracking-wider text-cyan-400">Fundamentals of Microwave Remote Sensing</span>
+          <h2 class="text-xl sm:text-2xl font-bold text-white mt-1">What is Synthetic Aperture Radar (SAR)?</h2>
+          <p class="text-sm text-slate-300 mt-1 max-w-4xl leading-relaxed">
+            Optical satellites (like Landsat or Sentinel-2) work like passive cameras—they depend on sunlight and are blinded by clouds, monsoon cover, polar night, or wildfire smoke. <strong>Synthetic Aperture Radar (SAR)</strong> is an <em>active</em> microwave sensor: it transmits its own electromagnetic pulses (centimeter-to-decimeter wavelengths) toward Earth and records both the <strong>amplitude</strong> (strength) and <strong>phase</strong> (exact travel-time fraction of a wavelength) of the backscattered echoes.
+          </p>
+        </div>
 
-      <!-- Sidebar Footer -->
-      <div class="p-3 border-t border-slate-800/80 bg-slate-950/60 text-[11px] text-slate-400 flex items-center justify-between">
-        <span>Pure Static HTML5 • No Build Step</span>
-        <span class="font-mono text-cyan-400">v1.0</span>
-      </div>
-    </aside>
-
-    <!-- Backdrop for mobile sidebar -->
-    <div id="sidebarBackdrop" class="fixed inset-0 bg-black/60 z-20 hidden lg:hidden"></div>
-
-    <!-- Main Content Area -->
-    <main class="flex-1 min-w-0 overflow-y-auto p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto w-full">
-
-      <!-- VIEW 1: OVERVIEW & INTERACTIVE MIND MAP -->
-      <section id="view-overview" class="space-y-8">
-        <!-- Hero Banner -->
-        <div class="rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-cyan-950/40 border border-slate-800 p-6 sm:p-8 relative overflow-hidden">
-          <div class="max-w-3xl space-y-4 relative z-10">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-medium">
-              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              20 Interactive HTML Simulations Mapped • 6 Chapters
-            </div>
-            <h1 class="text-2xl sm:text-4xl font-bold text-white tracking-tight">
-              Synthetic Aperture Radar for Earth Observation
-            </h1>
-            <p class="text-sm sm:text-base text-slate-300 leading-relaxed">
-              Welcome to your plain-HTML static course shell. Every chapter below organizes your 20 standalone HTML simulations into a logical learning path—from radar beamforming and complex phase signals to Sentinel-1 TOPS co-registration and multi-temporal InSAR phase linking.
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-2.5">
+            <div class="w-8 h-8 rounded-lg bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-mono text-xs font-bold">01</div>
+            <h3 class="text-base font-bold text-white">Synthesizing a Giant Antenna in Orbit</h3>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              From an 800 km orbit, a real radar antenna would need to be several kilometers long to focus a sharp 5-meter pixel on the ground. Instead, SAR uses the forward orbital motion of the satellite (~7.5 km/s) to coherently combine thousands of radar echoes along the flight track—synthesizing a virtual antenna kilometers in length.
             </p>
-            <div class="flex flex-wrap gap-3 pt-2">
-              <button id="startFirstLessonBtn" class="px-4 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold text-xs sm:text-sm transition shadow-lg shadow-cyan-500/20 flex items-center gap-2">
-                <span>Launch Lesson 1.1</span>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
-              </button>
-              <button id="jumpToGapsBtn" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-100 font-medium text-xs sm:text-sm border border-slate-700 transition">
-                View 8 Missing Illustrations to Add
-              </button>
-              <button id="jumpToGithubBtn" class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 font-medium text-xs sm:text-sm border border-slate-800 transition">
-                How to Drop Your 20 Files &amp; Push to GitHub
-              </button>
-            </div>
           </div>
 
-          <!-- Stats Row -->
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-8 pt-6 border-t border-slate-800/80">
-            <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-3.5">
-              <div class="text-xs text-slate-400">Total Chapters</div>
-              <div class="text-xl font-bold text-white mt-0.5">6 Modules</div>
-              <div class="text-[11px] text-cyan-400 mt-1">Physics → PolSAR &amp; EO</div>
-            </div>
-            <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-3.5">
-              <div class="text-xs text-slate-400">Your HTML Files</div>
-              <div class="text-xl font-bold text-emerald-400 mt-0.5">20 Ready</div>
-              <div class="text-[11px] text-slate-400 mt-1">Auto-wired via &lt;iframe&gt;</div>
-            </div>
-            <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-3.5">
-              <div class="text-xs text-slate-400">Recommended Additions</div>
-              <div class="text-xl font-bold text-amber-400 mt-0.5">8 Topics</div>
-              <div class="text-[11px] text-slate-400 mt-1">Geometry, Chirp, Unwrapping</div>
-            </div>
-            <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-3.5">
-              <div class="text-xs text-slate-400">Hosting Stack</div>
-              <div class="text-xl font-bold text-indigo-400 mt-0.5">100% HTML</div>
-              <div class="text-[11px] text-slate-400 mt-1">Zero Node/Python build needed</div>
-            </div>
+          <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-2.5">
+            <div class="w-8 h-8 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-mono text-xs font-bold">02</div>
+            <h3 class="text-base font-bold text-white">Amplitude vs. Coherent Phase</h3>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Every focused SAR pixel is a complex number <span class="mono text-cyan-300">z = I + jQ</span>. The <strong>amplitude</strong> reveals surface roughness, soil moisture, flood water, and forest structure. The <strong>phase</strong> measures the two-way distance to the ground within a fraction of the radar wavelength—enabling interferometry (InSAR) to detect millimeter surface motion.
+            </p>
+          </div>
+
+          <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-2.5">
+            <div class="w-8 h-8 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 font-mono text-xs font-bold">03</div>
+            <h3 class="text-base font-bold text-white">Wavelength Penetration &amp; Polarimetry</h3>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Different radar bands interact with different scales of matter: short <strong>X-band (3 cm)</strong> reflects from urban roofs and top leaves; <strong>C-band (5.6 cm)</strong> senses crops and ocean winds; long <strong>L-band (24 cm)</strong> and <strong>P-band (70 cm)</strong> penetrate dense forest canopies to map tree trunks, biomass, and sub-canopy ground motion.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION B: GLOBAL SAR SATELLITE MISSIONS & WHAT THEY DO -->
+      <div id="satellite-missions" class="space-y-5 scroll-mt-20">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+          <div>
+            <span class="text-xs font-mono uppercase tracking-wider text-indigo-400">Spaceborne Radar Fleet</span>
+            <h2 class="text-xl sm:text-2xl font-bold text-white mt-1">Major SAR Satellite Missions &amp; Applications</h2>
+            <p class="text-xs sm:text-sm text-slate-400 mt-0.5">How operational radar satellites across X, C, S, L, and P bands monitor Earth systems.</p>
           </div>
         </div>
 
-        <!-- Visual Interactive Curriculum Mind Map -->
-        <div class="space-y-4">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <h2 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
-                <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
-                Interactive Course Mind Map
-              </h2>
-              <p class="text-xs text-slate-400">Click any lesson node below to open its interactive lesson page, equations, and simulation container.</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Mission 1 -->
+          <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-3 flex flex-col justify-between">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-white">Sentinel-1 (1A / 1C)</span>
+                <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">C-Band (5.6 cm)</span>
+              </div>
+              <div class="text-[11px] text-slate-400 font-mono">ESA Copernicus • TOPSAR IW Mode (250 km swath)</div>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                The backbone of open-access global radar monitoring. Uses Terrain Observation with Progressive Scans (TOPS) to deliver 6-to-12 day repeat-pass InSAR worldwide.
+              </p>
             </div>
-            <div class="flex items-center gap-4 text-xs">
-              <span class="flex items-center gap-1.5 text-emerald-400"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span> Have HTML (20)</span>
-              <span class="flex items-center gap-1.5 text-amber-400"><span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span> Needed HTML (8)</span>
+            <div class="pt-2 border-t border-slate-800/80 text-[11px] text-slate-400">
+              <strong class="text-slate-200">Key Uses:</strong> Tectonic faults, urban land subsidence, rapid flood mapping, sea-ice shipping routes, and oil-spill detection.
             </div>
           </div>
 
-          <div id="mindMapGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
-        </div>
-      </section>
-
-      <!-- VIEW 2: LESSON VIEWER (IFRAME + BUILT-IN LIVE PREVIEW + THEORY) -->
-      <section id="view-lesson" class="hidden space-y-6">
-        <!-- Breadcrumb & Navigation Controls -->
-        <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-800">
-          <div class="flex items-center gap-2 text-xs text-slate-400">
-            <button id="backToMapBtn" class="hover:text-cyan-400 transition flex items-center gap-1">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-              Mind Map
-            </button>
-            <span>/</span>
-            <span id="lessonChapterBadge" class="text-slate-300 font-medium">Chapter 1</span>
-            <span>/</span>
-            <span id="lessonCodeBadge" class="text-cyan-400 font-mono">1.2</span>
+          <!-- Mission 2 -->
+          <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-3 flex flex-col justify-between">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-white">NISAR (NASA–ISRO)</span>
+                <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">L-Band (24 cm) + S-Band (9.4 cm)</span>
+              </div>
+              <div class="text-[11px] text-slate-400 font-mono">NASA &amp; ISRO • SweepSAR (240 km swath)</div>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                First dual-frequency spaceborne radar with a 12-meter deployable mesh reflector. L-band penetrates heavy vegetation where C-band loses coherence, while S-band characterizes crops and polar snow.
+              </p>
+            </div>
+            <div class="pt-2 border-t border-slate-800/80 text-[11px] text-slate-400">
+              <strong class="text-slate-200">Key Uses:</strong> Himalayan &amp; San Andreas crustal deformation, glacier ice-sheet dynamics, forest biomass, and agricultural soil moisture.
+            </div>
           </div>
 
-          <div class="flex items-center gap-2">
-            <button id="markCompleteBtn" class="px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-200 transition flex items-center gap-1.5">
-              <span id="markCompleteIcon" class="w-3.5 h-3.5 rounded border border-slate-500 inline-flex items-center justify-center"></span>
-              <span id="markCompleteText">Mark Lesson Complete</span>
-            </button>
-            <button id="prevLessonBtn" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition">← Prev</button>
-            <button id="nextLessonBtn" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition">Next →</button>
+          <!-- Mission 3 -->
+          <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-3 flex flex-col justify-between">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-white">ALOS-2 / ALOS-4 (PALSAR)</span>
+                <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">L-Band (23.6 cm)</span>
+              </div>
+              <div class="text-[11px] text-slate-400 font-mono">JAXA (Japan) • Quad-Pol &amp; ScanSAR</div>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                Long-wavelength L-band radar capable of full quad-polarization (HH, HV, VH, VV) and high-coherence interferometry across densely forested mountains and volcanic arcs.
+              </p>
+            </div>
+            <div class="pt-2 border-t border-slate-800/80 text-[11px] text-slate-400">
+              <strong class="text-slate-200">Key Uses:</strong> Tropical deforestation alerts (JJ-FAST), forested landslide creep, volcanic unrest, and earthquake slip inversion.
+            </div>
+          </div>
+
+          <!-- Mission 4 -->
+          <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-3 flex flex-col justify-between">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-white">TerraSAR-X / TanDEM-X &amp; COSMO-SkyMed</span>
+                <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">X-Band (3.1 cm)</span>
+              </div>
+              <div class="text-[11px] text-slate-400 font-mono">DLR &amp; ASI • Spotlight &amp; Bistatic Interferometry</div>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                High-frequency, sub-meter resolution radars. TanDEM-X flew two satellites in close helix formation to acquire single-pass interferograms without atmospheric or temporal decorrelation.
+              </p>
+            </div>
+            <div class="pt-2 border-t border-slate-800/80 text-[11px] text-slate-400">
+              <strong class="text-slate-200">Key Uses:</strong> Global WorldDEM generation, bridge &amp; dam structural stability, urban persistent scatterers, and high-res disaster response.
+            </div>
+          </div>
+
+          <!-- Mission 5 -->
+          <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-3 flex flex-col justify-between">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-white">EOS-04 (RISAT-1A) &amp; RADARSAT</span>
+                <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">C-Band (5.6 cm)</span>
+              </div>
+              <div class="text-[11px] text-slate-400 font-mono">ISRO &amp; CSA • Hybrid / Compact Polarimetry</div>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                Operational all-weather radar missions designed for monsoon agriculture, hydrology, and maritime domain awareness using linear and circular hybrid polarimetric modes.
+              </p>
+            </div>
+            <div class="pt-2 border-t border-slate-800/80 text-[11px] text-slate-400">
+              <strong class="text-slate-200">Key Uses:</strong> Kharif paddy crop monitoring during monsoon clouds, soil moisture estimation, flood inundation, and coastal surveillance.
+            </div>
+          </div>
+
+          <!-- Mission 6 -->
+          <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-3 flex flex-col justify-between">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-white">BIOMASS (ESA Earth Explorer)</span>
+                <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-purple-500/15 text-purple-300 border border-purple-500/30">P-Band (70 cm)</span>
+              </div>
+              <div class="text-[11px] text-slate-400 font-mono">ESA • Full Polarimetric &amp; Tomographic SAR</div>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                The longest-wavelength spaceborne SAR ever flown (435 MHz). Its 70 cm waves pierce completely through dense tropical rainforest canopies to the forest floor.
+              </p>
+            </div>
+            <div class="pt-2 border-t border-slate-800/80 text-[11px] text-slate-400">
+              <strong class="text-slate-200">Key Uses:</strong> 3D SAR tomography of tropical forest structure, above-ground carbon stock mapping, and sub-surface desert paleo-hydrology.
+            </div>
           </div>
         </div>
+      </div>
 
-        <!-- Lesson Title & File Header -->
-        <div class="space-y-3">
+      <!-- SECTION C: COURSE CONTENTS (6 CHAPTERS & 28 INTERACTIVE MODULES) -->
+      <div id="course-contents" class="space-y-5 scroll-mt-20">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+          <div>
+            <span class="text-xs font-mono uppercase tracking-wider text-cyan-400">Structured Learning Path</span>
+            <h2 class="text-xl sm:text-2xl font-bold text-white mt-1">Course Contents &amp; Interactive Simulations</h2>
+            <p class="text-xs sm:text-sm text-slate-400 mt-0.5">Select any lesson below to launch its interactive simulation, mathematical formulation, and guided exercises.</p>
+          </div>
+
+          <!-- Search & Filter Bar right above the Contents Grid -->
           <div class="flex flex-wrap items-center gap-2">
-            <span id="lessonStatusPill" class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
-              ✓ Existing HTML Illustration
-            </span>
-            <span class="text-xs font-mono text-slate-400 bg-slate-900 px-2.5 py-0.5 rounded border border-slate-800" id="lessonFilePill">
-              simulations/antenna_radiation_pattern.html
-            </span>
+            <div class="relative w-full sm:w-64">
+              <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+              <input id="searchInput" type="text" placeholder="Search lessons or concepts..." class="w-full bg-slate-900 border border-slate-800 focus:border-cyan-500 rounded-xl pl-9 pr-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none">
+            </div>
+            <div class="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
+              <button data-filter="all" class="filter-chip px-2.5 py-1 rounded-lg text-[11px] font-medium bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">All (28)</button>
+              <button data-filter="have" class="filter-chip px-2.5 py-1 rounded-lg text-[11px] font-medium text-slate-400 hover:text-slate-200 border border-transparent">Simulations (20)</button>
+            </div>
           </div>
-          <h1 id="lessonTitle" class="text-2xl sm:text-3xl font-bold text-white tracking-tight"></h1>
-          <p id="lessonSummary" class="text-sm sm:text-base text-slate-300 leading-relaxed"></p>
         </div>
 
-        <!-- Simulation Frame Container -->
-        <div class="rounded-2xl border border-slate-800 bg-slate-900/70 overflow-hidden shadow-2xl">
-          <!-- Frame Toolbar -->
-          <div class="px-4 py-2.5 bg-slate-900 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2">
-            <div class="flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
-              <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
-              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
-              <span id="frameTitleBar" class="ml-2 text-xs font-mono text-slate-300 truncate max-w-xs sm:max-w-md"></span>
-            </div>
+        <div id="mindMapGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5"></div>
+      </div>
 
-            <div class="flex items-center gap-1.5">
-              <button id="modeIframeBtn" class="px-2.5 py-1 rounded text-xs font-medium bg-cyan-500 text-slate-950 font-semibold transition">
-                External File (&lt;iframe&gt;)
-              </button>
-              <button id="modeSandboxBtn" class="px-2.5 py-1 rounded text-xs font-medium bg-slate-800 text-slate-300 hover:text-white transition">
-                Built-In Interactive Demo
-              </button>
-              <a id="openStandaloneLink" href="#" target="_blank" rel="noopener" class="px-2.5 py-1 rounded text-xs font-medium bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 transition flex items-center gap-1">
-                <span>Full Tab</span>
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-              </a>
-            </div>
+    </section>
+
+    <!-- VIEW 2: LESSON VIEWER (IFRAME + BUILT-IN LIVE PREVIEW + THEORY) -->
+    <section id="view-lesson" class="hidden space-y-6">
+      <!-- Breadcrumb, Quick Lesson Switcher & Navigation Controls -->
+      <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-800">
+        <div class="flex flex-wrap items-center gap-2 text-xs text-slate-400">
+          <button id="backToMapBtn" class="px-2.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 hover:border-cyan-500/40 transition flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            <span>All Contents</span>
+          </button>
+          <span class="text-slate-600">/</span>
+          <select id="lessonQuickSelect" aria-label="Jump to lesson" class="bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-cyan-500 max-w-xs sm:max-w-md"></select>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button id="markCompleteBtn" class="px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-200 transition flex items-center gap-1.5">
+            <span id="markCompleteIcon" class="w-3.5 h-3.5 rounded border border-slate-500 inline-flex items-center justify-center"></span>
+            <span id="markCompleteText">Mark Complete</span>
+          </button>
+          <button id="prevLessonBtn" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition">← Prev</button>
+          <button id="nextLessonBtn" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition">Next →</button>
+        </div>
+      </div>
+
+      <!-- Lesson Title & Header -->
+      <div class="space-y-2.5">
+        <div class="flex flex-wrap items-center gap-2">
+          <span id="lessonChapterBadge" class="text-xs font-mono uppercase tracking-wider text-cyan-400">Chapter 1</span>
+          <span class="text-slate-600">•</span>
+          <span id="lessonStatusPill" class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+            Interactive Simulation
+          </span>
+          <span class="text-xs font-mono text-slate-500 hidden sm:inline" id="lessonFilePill"></span>
+        </div>
+        <h1 id="lessonTitle" class="text-2xl sm:text-3xl font-bold text-white tracking-tight"></h1>
+        <p id="lessonSummary" class="text-sm sm:text-base text-slate-300 leading-relaxed"></p>
+      </div>
+
+      <!-- Simulation Frame Container -->
+      <div class="rounded-2xl border border-slate-800 bg-slate-900/70 overflow-hidden shadow-2xl">
+        <!-- Frame Toolbar -->
+        <div class="px-4 py-2.5 bg-slate-900 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
+            <span id="frameTitleBar" class="ml-2 text-xs font-mono text-slate-300 truncate max-w-xs sm:max-w-md"></span>
           </div>
 
-          <!-- Mode A: External HTML File Iframe (for GitHub Pages / local folder) -->
-          <div id="externalIframeContainer" class="relative bg-slate-950" style="min-height: 460px;">
-            <iframe id="simulationIframe" class="w-full h-[500px] border-0" title="SAR Interactive Simulation"></iframe>
-            <!-- Helpful overlay banner explaining how external files load once placed in /simulations/ -->
-            <div id="iframeHelperBanner" class="bg-slate-900/95 border-t border-slate-800 px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div class="text-xs text-slate-300">
-                <strong class="text-cyan-400">GitHub Folder Binding:</strong> This <code class="mono text-amber-300">&lt;iframe&gt;</code> points directly to <code id="iframeTargetCode" class="mono text-emerald-300"></code>. Drop your 20 HTML files into the <code class="mono">simulations/</code> folder in your repo and they load here automatically! Want to interact right now inside this preview?
+          <div class="flex items-center gap-1.5">
+            <button id="modeIframeBtn" class="px-2.5 py-1 rounded text-xs font-medium bg-cyan-500 text-slate-950 font-semibold transition">
+              Interactive Simulation
+            </button>
+            <button id="modeSandboxBtn" class="px-2.5 py-1 rounded text-xs font-medium bg-slate-800 text-slate-300 hover:text-white transition">
+              Concept Explorer
+            </button>
+            <a id="openStandaloneLink" href="#" target="_blank" rel="noopener" class="px-2.5 py-1 rounded text-xs font-medium bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 transition flex items-center gap-1">
+              <span>Full Screen</span>
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Mode A: External HTML Simulation Iframe -->
+        <div id="externalIframeContainer" class="relative bg-slate-950" style="min-height: 520px;">
+          <iframe id="simulationIframe" class="w-full h-[560px] border-0" title="SAR Interactive Simulation"></iframe>
+        </div>
+
+        <!-- Mode B: Built-in Interactive Concept Explorer -->
+        <div id="builtinDemoContainer" class="hidden p-5 bg-slate-950 space-y-4">
+          <div class="flex flex-col lg:flex-row gap-5 items-stretch">
+            <div class="flex-1 bg-slate-900 border border-slate-800 rounded-xl p-3 flex flex-col">
+              <div class="flex items-center justify-between mb-2">
+                <span id="demoCanvasTitle" class="text-xs font-mono uppercase tracking-wider text-cyan-400">Interactive Signal &amp; Phase Visualizer</span>
+                <span id="demoReadout" class="text-xs font-mono text-emerald-400"></span>
               </div>
-              <button id="switchToDemoBtn" class="shrink-0 px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 text-xs font-medium transition">
-                Switch to Built-In Interactive Demo →
-              </button>
+              <div class="relative flex-1 min-h-[280px] flex items-center justify-center">
+                <canvas id="interactiveCanvas" class="w-full h-[280px] rounded-lg bg-slate-950"></canvas>
+              </div>
             </div>
-          </div>
 
-          <!-- Mode B: Built-in Interactive Canvas Simulation (works immediately in Canvas preview) -->
-          <div id="builtinDemoContainer" class="hidden p-5 bg-slate-950 space-y-4">
-            <div class="flex flex-col lg:flex-row gap-5 items-stretch">
-              <div class="flex-1 bg-slate-900 border border-slate-800 rounded-xl p-3 flex flex-col">
-                <div class="flex items-center justify-between mb-2">
-                  <span id="demoCanvasTitle" class="text-xs font-mono uppercase tracking-wider text-cyan-400">Interactive Signal &amp; Phase Visualizer</span>
-                  <span id="demoReadout" class="text-xs font-mono text-emerald-400"></span>
+            <!-- Interactive Sliders -->
+            <div class="w-full lg:w-72 bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between space-y-4">
+              <div class="space-y-4">
+                <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-400">Model Parameters</h4>
+                <div>
+                  <div class="flex justify-between text-xs mb-1">
+                    <span id="slider1Label" class="text-slate-300">Parameter 1</span>
+                    <span id="slider1Val" class="font-mono text-cyan-400">50</span>
+                  </div>
+                  <input id="slider1" type="range" min="1" max="100" value="50" class="w-full accent-cyan-400 cursor-pointer">
                 </div>
-                <div class="relative flex-1 min-h-[280px] flex items-center justify-center">
-                  <canvas id="interactiveCanvas" class="w-full h-[280px] rounded-lg bg-slate-950"></canvas>
+                <div>
+                  <div class="flex justify-between text-xs mb-1">
+                    <span id="slider2Label" class="text-slate-300">Parameter 2</span>
+                    <span id="slider2Val" class="font-mono text-cyan-400">35</span>
+                  </div>
+                  <input id="slider2" type="range" min="1" max="100" value="35" class="w-full accent-cyan-400 cursor-pointer">
+                </div>
+                <div>
+                  <div class="flex justify-between text-xs mb-1">
+                    <span id="slider3Label" class="text-slate-300">Noise / Decorrelation</span>
+                    <span id="slider3Val" class="font-mono text-cyan-400">15</span>
+                  </div>
+                  <input id="slider3" type="range" min="0" max="100" value="15" class="w-full accent-cyan-400 cursor-pointer">
                 </div>
               </div>
 
-              <!-- Interactive Sliders -->
-              <div class="w-full lg:w-72 bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between space-y-4">
-                <div class="space-y-4">
-                  <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-400">Simulation Parameters</h4>
-                  <div>
-                    <div class="flex justify-between text-xs mb-1">
-                      <span id="slider1Label" class="text-slate-300">Parameter 1</span>
-                      <span id="slider1Val" class="font-mono text-cyan-400">50</span>
-                    </div>
-                    <input id="slider1" type="range" min="1" max="100" value="50" class="w-full accent-cyan-400 cursor-pointer">
-                  </div>
-                  <div>
-                    <div class="flex justify-between text-xs mb-1">
-                      <span id="slider2Label" class="text-slate-300">Parameter 2</span>
-                      <span id="slider2Val" class="font-mono text-cyan-400">35</span>
-                    </div>
-                    <input id="slider2" type="range" min="1" max="100" value="35" class="w-full accent-cyan-400 cursor-pointer">
-                  </div>
-                  <div>
-                    <div class="flex justify-between text-xs mb-1">
-                      <span id="slider3Label" class="text-slate-300">Noise / Decorrelation</span>
-                      <span id="slider3Val" class="font-mono text-cyan-400">15</span>
-                    </div>
-                    <input id="slider3" type="range" min="0" max="100" value="15" class="w-full accent-cyan-400 cursor-pointer">
-                  </div>
-                </div>
-
-                <div class="p-3 rounded-lg bg-slate-950 border border-slate-800/80 text-[11px] text-slate-400 leading-relaxed">
-                  <strong class="text-slate-200 block mb-0.5">Live Concept Preview:</strong>
-                  <span id="demoExplanationText">Adjust the sliders above to inspect how radar phase, coherence, and spatial resampling respond in real time.</span>
-                </div>
+              <div class="p-3 rounded-lg bg-slate-950 border border-slate-800/80 text-[11px] text-slate-400 leading-relaxed">
+                <strong class="text-slate-200 block mb-0.5">Interactive Exploration:</strong>
+                <span id="demoExplanationText">Adjust the sliders above to inspect how radar phase, coherence, and spatial resampling respond in real time.</span>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- Lesson Content Grid: Concepts, Math & Guided Exercises -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <!-- Left 2 Columns: Theory & Guided Lab -->
-          <div class="lg:col-span-2 space-y-6">
-            <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 sm:p-6 space-y-3">
-              <h3 class="text-base font-bold text-white flex items-center gap-2">
-                <span class="w-2 h-5 rounded bg-cyan-400"></span>
-                Physical Intuition &amp; Earth Observation Context
-              </h3>
-              <p id="lessonTheoryText" class="text-sm text-slate-300 leading-relaxed"></p>
-            </div>
-
-            <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 sm:p-6 space-y-4">
-              <h3 class="text-base font-bold text-white flex items-center gap-2">
-                <span class="w-2 h-5 rounded bg-emerald-400"></span>
-                Guided Interactive Exploration Tasks
-              </h3>
-              <ul id="lessonExercisesList" class="space-y-2.5 text-sm text-slate-300"></ul>
-            </div>
+      <!-- Lesson Content Grid: Concepts, Math & Guided Exercises -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Left 2 Columns: Theory & Guided Lab -->
+        <div class="lg:col-span-2 space-y-6">
+          <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 sm:p-6 space-y-3">
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <span class="w-2 h-5 rounded bg-cyan-400"></span>
+              Physical Intuition &amp; Earth Observation Context
+            </h3>
+            <p id="lessonTheoryText" class="text-sm text-slate-300 leading-relaxed"></p>
           </div>
 
-          <!-- Right Column: Key Equation, Mission Tie-In & Quick Quiz -->
-          <div class="space-y-6">
-            <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-3">
-              <h3 class="text-xs font-mono uppercase tracking-wider text-cyan-400">Governing Equation</h3>
-              <div id="lessonEquationBox" class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 font-mono text-xs sm:text-sm text-amber-300 overflow-x-auto"></div>
-              <p id="lessonEquationDesc" class="text-xs text-slate-400 leading-relaxed"></p>
-            </div>
-
-            <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-3">
-              <h3 class="text-xs font-mono uppercase tracking-wider text-indigo-400">Satellite Mission Benchmark</h3>
-              <p id="lessonMissionText" class="text-xs text-slate-300 leading-relaxed"></p>
-            </div>
-
-            <!-- Self-Check Question -->
-            <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-3">
-              <h3 class="text-xs font-mono uppercase tracking-wider text-emerald-400">Concept Check</h3>
-              <p id="quizQuestion" class="text-xs font-medium text-white leading-relaxed"></p>
-              <div id="quizOptions" class="space-y-2 pt-1"></div>
-              <div id="quizFeedback" class="hidden text-xs p-2.5 rounded-lg border"></div>
-            </div>
+          <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 sm:p-6 space-y-4">
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <span class="w-2 h-5 rounded bg-emerald-400"></span>
+              Guided Interactive Exploration Tasks
+            </h3>
+            <ul id="lessonExercisesList" class="space-y-2.5 text-sm text-slate-300"></ul>
           </div>
         </div>
-      </section>
 
-      <!-- VIEW 3: MISSING ILLUSTRATIONS & MATERIALS CHECKLIST -->
-      <section id="view-gaps" class="hidden space-y-6">
-        <div class="rounded-2xl bg-slate-900/70 border border-slate-800 p-6 space-y-3">
-          <span class="text-xs font-mono uppercase tracking-wider text-amber-400">Curriculum Gap Analysis</span>
-          <h2 class="text-2xl font-bold text-white">8 Missing Illustrations &amp; Supporting Course Materials</h2>
-          <p class="text-sm text-slate-300 max-w-3xl leading-relaxed">
-            Your 20 existing HTML files cover advanced resampling, Sentinel-1 TOPS co-registration, and InSAR/DInSAR thoroughly. To make your site welcoming for beginners and complete for Earth Observation applications, here are the 8 missing HTML simulations and supporting materials to add next.
-          </p>
-        </div>
-
-        <div id="missingCardsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-
-        <!-- Additional Materials Checklist -->
-        <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-6 space-y-4">
-          <h3 class="text-lg font-bold text-white">Other Course Materials to Pair with Your HTML Files</h3>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-            <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5">
-              <div class="font-semibold text-cyan-400">1. Real Sentinel-1 &amp; NISAR Snapshots</div>
-              <p class="text-slate-400 leading-relaxed">Include 1 static real satellite image per lesson (e.g., Ridgecrest earthquake fringes, Amazon deforestation RGB) so students connect synthetic sliders to real SAR data.</p>
-            </div>
-            <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5">
-              <div class="font-semibold text-emerald-400">2. Formula Variable Dictionary</div>
-              <p class="text-slate-400 leading-relaxed">Keep notation uniform across all 20 HTML files: use λ for wavelength, θ for incidence angle, B⊥ for perpendicular baseline, and γ for coherence.</p>
-            </div>
-            <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5">
-              <div class="font-semibold text-amber-400">3. Guided Mini-Experiments</div>
-              <p class="text-slate-400 leading-relaxed">Give learners 3 concrete slider challenges beneath every HTML widget (already pre-written for all 28 lessons in this static site!).</p>
-            </div>
-            <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5">
-              <div class="font-semibold text-indigo-400">4. Open-Source Python Links</div>
-              <p class="text-slate-400 leading-relaxed">Link chapters to ESA SNAP, ISCE2, MintPy, and PyGMTSAR workflows for students ready to process real SLC stacks.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- VIEW 4: GITHUB PAGES DEPLOYMENT & FOLDER GUIDE -->
-      <section id="view-github" class="hidden space-y-6">
-        <div class="rounded-2xl bg-slate-900/70 border border-slate-800 p-6 space-y-3">
-          <span class="text-xs font-mono uppercase tracking-wider text-cyan-400">Zero-Dependency Deployment</span>
-          <h2 class="text-2xl font-bold text-white">How to Host This Basic HTML Site on GitHub Pages</h2>
-          <p class="text-sm text-slate-300 max-w-3xl leading-relaxed">
-            Because this website is built in **pure static HTML/CSS/JS**, you don't need Node.js, Webpack, Vite, or any build pipeline. Just place this <code class="mono text-cyan-300">index.html</code> in your repository root and drop your 20 existing HTML files into a <code class="mono text-cyan-300">simulations/</code> subfolder.
-          </p>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <!-- Folder Layout -->
+        <!-- Right Column: Key Equation, Mission Tie-In & Quick Quiz -->
+        <div class="space-y-6">
           <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-3">
-            <div class="flex items-center justify-between">
-              <h3 class="text-sm font-bold text-white">1. Exact Folder Structure</h3>
-              <span class="text-[11px] font-mono text-emerald-400">Works with exact filenames from your screenshot</span>
-            </div>
-            <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-slate-300 overflow-x-auto leading-relaxed">your-github-repo/
-├── index.html   &lt;-- (This static website shell)
-├── README.md
-└── simulations/ &lt;-- (Put your 20 HTML files here)
-    ├── 3-Pass Differential InSAR.html
-    ├── antenna_radiation_pattern.html
-    ├── grid_interpolator.html
-    ├── InSAR Phase-to-Displacement Vector Calculator.html
-    ├── InSAR Radar Path Length and Phase Shift.html
-    ├── InSAR Spatial Phase Coherence.html
-    ├── InSAR Spectral Diversity.html
-    ├── InSAR Topographic Acquisition and Fringes.html
-    ├── InSAR Topographic Phase Subtraction.html
-    ├── Joint InSAR Image Co-Registration.html
-    ├── Phase Linking InSAR Denoising.html
-    ├── SAR Coregistration Pipeline.html
-    ├── SAR Image Co-Registration Peak.html
-    ├── SAR Image Grid Spatial Alignment and Resampling.html
-    ├── SAR Phase Signal Processing.html
-    ├── SAR speckle filtering mechancism.html
-    ├── SAR_multiptemporal_RGB_pipeline.html
-    ├── Sentinel-1 Enhanced Spectral Diversity.html
-    ├── Sentinel-1 TOPS Coregistration.html
-    └── Sinc Sub-Pixel Signal Reconstruction.html</pre>
+            <h3 class="text-xs font-mono uppercase tracking-wider text-cyan-400">Governing Equation</h3>
+            <div id="lessonEquationBox" class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 font-mono text-xs sm:text-sm text-amber-300 overflow-x-auto"></div>
+            <p id="lessonEquationDesc" class="text-xs text-slate-400 leading-relaxed"></p>
           </div>
 
-          <!-- Git Commands -->
-          <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-4">
-            <div class="flex items-center justify-between">
-              <h3 class="text-sm font-bold text-white">2. Git Commands to Push &amp; Publish</h3>
-              <button id="copyGitCommandsBtn" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs font-mono text-cyan-300 border border-slate-700 transition">
-                Copy Commands
-              </button>
-            </div>
-            <pre id="gitCommandsBlock" class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-emerald-300 overflow-x-auto leading-relaxed"># 1. Inside your project folder, create the simulations subfolder
-mkdir simulations
+          <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-3">
+            <h3 class="text-xs font-mono uppercase tracking-wider text-indigo-400">Satellite Mission Benchmark</h3>
+            <p id="lessonMissionText" class="text-xs text-slate-300 leading-relaxed"></p>
+          </div>
 
-# 2. Move your 20 HTML illustrations into simulations/
-# (Keep index.html in the root folder)
-
-# 3. Initialize Git and push to GitHub
-git init
-git add .
-git commit -m "Initial commit: SAR EO interactive website and 20 simulations"
-git branch -M main
-git remote add origin https://github.com/YOUR-USERNAME/YOUR-REPO-NAME.git
-git push -u origin main</pre>
-
-            <div class="p-4 rounded-xl bg-cyan-950/30 border border-cyan-500/30 space-y-2 text-xs text-slate-300">
-              <div class="font-semibold text-cyan-300">3. Enable GitHub Pages (Takes 30 Seconds):</div>
-              <ol class="list-decimal list-inside space-y-1 text-slate-300">
-                <li>Open your repository on GitHub and click <strong>Settings → Pages</strong>.</li>
-                <li>Under <strong>Build and deployment → Source</strong>, select <strong>Deploy from a branch</strong>.</li>
-                <li>Choose branch <code class="mono text-white">main</code> and folder <code class="mono text-white">/ (root)</code>, then click <strong>Save</strong>.</li>
-                <li>Your live site will be published at <code class="mono text-cyan-300">https://YOUR-USERNAME.github.io/YOUR-REPO-NAME/</code>!</li>
-              </ol>
-            </div>
+          <!-- Self-Check Question -->
+          <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-3">
+            <h3 class="text-xs font-mono uppercase tracking-wider text-emerald-400">Concept Check</h3>
+            <p id="quizQuestion" class="text-xs font-medium text-white leading-relaxed"></p>
+            <div id="quizOptions" class="space-y-2 pt-1"></div>
+            <div id="quizFeedback" class="hidden text-xs p-2.5 rounded-lg border"></div>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-    </main>
-  </div>
+  </main>
+
+  <!-- Subtle Course Footer with Author Credit -->
+  <footer class="border-t border-slate-900 bg-slate-950/90 py-6 px-4 lg:px-8 mt-12">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+      <div class="flex items-center gap-2">
+        <span class="font-semibold text-slate-300">SAR<span class="text-cyan-400">EO</span></span>
+        <span>—</span>
+        <span>Synthetic Aperture Radar for Earth Observation</span>
+      </div>
+      <div class="text-slate-400">
+        Created &amp; curated by <span class="text-slate-200 font-medium">Sharayu</span>
+      </div>
+    </div>
+  </footer>
 
   <!-- Toast Notification -->
   <div id="toast" class="fixed bottom-5 right-5 z-50 hidden px-4 py-2.5 rounded-xl bg-slate-900 border border-cyan-500/50 text-xs text-white shadow-xl"></div>
 
   <script>
-    // Complete Curriculum Data (20 Existing + 8 Recommended Additions)
+    // Complete Curriculum Data
     const CHAPTERS = [
       {
         id: 'ch1',
@@ -921,7 +915,7 @@ git push -u origin main</pre>
             equationDesc: 'With a ~4,800 Hz Doppler separation in Sentinel-1 burst overlaps, ESD easily resolves azimuth shifts smaller than 0.001 pixels.',
             mission: 'Includes both `InSAR Spectral Diversity.html` and `Sentinel-1 Enhanced Spectral Diversity.html`.',
             exercises: [
-              'Toggle between your two HTML simulations (`InSAR Spectral Diversity.html` and `Sentinel-1 Enhanced Spectral Diversity.html`) using the selector below.',
+              'Toggle between the two simulations (`InSAR Spectral Diversity.html` and `Sentinel-1 Enhanced Spectral Diversity.html`) using the button below.',
               'Adjust the burst overlap Doppler separation Δf_ovl and observe the sensitivity of Δφ_ESD to sub-millipixel shifts.',
               'Verify that topographic and deformation phases cancel out in the double-difference overlap product.'
             ],
@@ -1199,7 +1193,7 @@ git push -u origin main</pre>
             status: 'missing',
             file: 'sar_wavelength_polarimetry.html',
             demoType: 'rgb',
-            summary: 'Interactive comparison of X, C, L, and P-band canopy penetration alongside Surface ( Bragg), Double-Bounce (Dihedral), and Volume scattering.',
+            summary: 'Interactive comparison of X, C, L, and P-band canopy penetration alongside Surface (Bragg), Double-Bounce (Dihedral), and Volume scattering.',
             theory: 'Radar waves interact with structures comparable in size to their wavelength λ. Short X-band (3 cm) and C-band (5.6 cm) waves scatter off top leaves and twigs, whereas longer L-band (24 cm) and P-band (70 cm) waves penetrate through forest canopies to hit tree trunks and the ground. Simultaneously, transmitting and receiving Horizontal (H) and Vertical (V) polarizations separates Single-Bounce rough surfaces (strong HH & VV), Double-Bounce urban/flooded-forest dihedrals (strong HH > VV with 180° phase shift), and random Volume canopies (strong cross-pol HV).',
             equation: 'S = [ S_HH   S_HV ;  S_VH   S_VV ]   |   k_Pauli = (1/√2) [ S_HH+S_VV,  S_HH-S_VV,  2·S_HV ]ᵀ',
             equationDesc: 'Pauli RGB decomposition assigns |S_HH - S_VV| (Double-Bounce) to Red, 2|S_HV| (Volume) to Green, and |S_HH + S_VV| (Surface) to Blue.',
@@ -1286,10 +1280,10 @@ git push -u origin main</pre>
     // State
     let currentView = 'overview';
     let currentLessonId = '1.2';
-    let sidebarFilter = 'all';
+    let contentFilter = 'all';
     let searchQuery = '';
     let completedLessons = {};
-    let currentSimMode = 'sandbox'; // Default to 'sandbox' so user gets instant visual interactivity in Canvas while also seeing iframe code!
+    let currentSimMode = 'iframe';
     let activeSecondaryFile = false;
 
     try {
@@ -1321,113 +1315,76 @@ git push -u origin main</pre>
     // Navigation View Switcher
     function switchView(viewName) {
       currentView = viewName;
-      ['overview', 'lesson', 'gaps', 'github'].forEach(v => {
+      ['overview', 'lesson'].forEach(v => {
         const el = document.getElementById('view-' + v);
         if (el) el.classList.toggle('hidden', v !== viewName);
       });
       document.querySelectorAll('.nav-tab').forEach(btn => {
         const isMatch = btn.getAttribute('data-nav') === viewName;
-        btn.className = 'nav-tab px-3.5 py-1.5 rounded-lg text-xs font-medium transition whitespace-nowrap ' +
+        btn.className = 'nav-tab px-4 py-1.5 rounded-lg text-xs font-medium transition whitespace-nowrap ' +
           (isMatch ? 'bg-cyan-500 text-slate-950 font-semibold' : 'text-slate-300 hover:text-white');
       });
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // Render Sidebar Chapters & Lessons
-    function renderSidebar() {
-      const container = document.getElementById('chapterList');
-      container.innerHTML = '';
-
+    // Populate Lesson Quick Select Dropdown in Lesson View
+    function populateLessonSelect() {
+      const sel = document.getElementById('lessonQuickSelect');
+      if (!sel) return;
+      sel.innerHTML = '';
       CHAPTERS.forEach(ch => {
-        const filtered = ch.lessons.filter(l => {
-          if (sidebarFilter === 'have' && l.status !== 'have') return false;
-          if (sidebarFilter === 'missing' && l.status !== 'missing') return false;
-          if (searchQuery) {
-            const q = searchQuery.toLowerCase();
-            return l.title.toLowerCase().includes(q) || l.file.toLowerCase().includes(q) || l.id.includes(q);
-          }
-          return true;
+        const grp = document.createElement('optgroup');
+        grp.label = `${ch.number} — ${ch.title}`;
+        ch.lessons.forEach(l => {
+          const opt = document.createElement('option');
+          opt.value = l.id;
+          opt.textContent = `${l.id} ${l.title}`;
+          grp.appendChild(opt);
         });
-
-        if (filtered.length === 0) return;
-
-        const chBlock = document.createElement('div');
-        chBlock.className = 'rounded-xl bg-slate-950/50 border border-slate-800/80 overflow-hidden';
-
-        const header = document.createElement('div');
-        header.className = 'px-3 py-2 bg-slate-900/90 border-b border-slate-800/60 flex items-center justify-between';
-        header.innerHTML = `
-          <div>
-            <div class="text-[10px] font-mono uppercase tracking-wider text-cyan-400">${ch.number}</div>
-            <div class="text-xs font-semibold text-slate-200">${ch.title}</div>
-          </div>
-          <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">${filtered.length}</span>
-        `;
-        chBlock.appendChild(header);
-
-        const list = document.createElement('div');
-        list.className = 'divide-y divide-slate-800/40';
-
-        filtered.forEach(l => {
-          const isActive = (currentView === 'lesson' && currentLessonId === l.id);
-          const isDone = !!completedLessons[l.id];
-          const btn = document.createElement('button');
-          btn.className = 'w-full text-left px-3 py-2.5 transition flex items-start gap-2.5 ' +
-            (isActive ? 'bg-cyan-500/15 border-l-2 border-cyan-400' : 'hover:bg-slate-900/60');
-
-          const statusDot = l.status === 'have'
-            ? `<span class="w-2 h-2 rounded-full bg-emerald-400 mt-1.5 shrink-0" title="HTML File Ready"></span>`
-            : `<span class="w-2 h-2 rounded-full bg-amber-400 mt-1.5 shrink-0" title="Recommended New Topic"></span>`;
-
-          btn.innerHTML = `
-            ${statusDot}
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center justify-between gap-1">
-                <span class="text-[11px] font-mono ${isActive ? 'text-cyan-300 font-semibold' : 'text-slate-400'}">${l.id}</span>
-                ${isDone ? '<span class="text-[10px] text-emerald-400 font-mono">✓ Done</span>' : ''}
-              </div>
-              <div class="text-xs font-medium ${isActive ? 'text-white' : 'text-slate-300'} leading-snug mt-0.5">${l.title}</div>
-              <div class="text-[10px] font-mono text-slate-500 truncate mt-0.5">${l.file}</div>
-            </div>
-          `;
-          btn.addEventListener('click', () => {
-            openLesson(l.id);
-            closeMobileSidebar();
-          });
-          list.appendChild(btn);
-        });
-
-        chBlock.appendChild(list);
-        container.appendChild(chBlock);
+        sel.appendChild(grp);
       });
     }
 
-    // Render Interactive Mind Map on Overview
+    // Render Course Contents Cards on Main Page
     function renderMindMap() {
       const grid = document.getElementById('mindMapGrid');
       grid.innerHTML = '';
 
       CHAPTERS.forEach(ch => {
-        const haveCount = ch.lessons.filter(l => l.status === 'have').length;
+        const filteredLessons = ch.lessons.filter(l => {
+          if (contentFilter === 'have' && l.status !== 'have') return false;
+          if (searchQuery) {
+            const q = searchQuery.toLowerCase();
+            return l.title.toLowerCase().includes(q) || l.summary.toLowerCase().includes(q) || l.id.includes(q);
+          }
+          return true;
+        });
+
+        if (filteredLessons.length === 0) return;
+
         const card = document.createElement('div');
         card.className = 'rounded-2xl bg-slate-900/60 border border-slate-800 p-5 flex flex-col justify-between space-y-4 hover:border-slate-700 transition';
 
         let lessonsHtml = '';
-        ch.lessons.forEach(l => {
-          const badgeClass = l.status === 'have'
-            ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/20'
-            : 'bg-amber-500/10 text-amber-300 border-amber-500/30 hover:bg-amber-500/20';
-          const tagText = l.status === 'have' ? 'HAVE' : 'NEW';
+        filteredLessons.forEach(l => {
+          const isDone = !!completedLessons[l.id];
+          const badgeClass = isDone
+            ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+            : (l.status === 'have'
+                ? 'bg-cyan-500/10 text-cyan-300 border-cyan-500/30 group-hover:bg-cyan-500/20'
+                : 'bg-slate-800 text-slate-400 border-slate-700');
+          const tagText = isDone ? '✓ Done' : (l.status === 'have' ? 'Interactive Lab' : 'Concept Module');
+
           lessonsHtml += `
-            <button data-lesson-id="${l.id}" class="mindmap-node w-full text-left p-2.5 rounded-xl bg-slate-950/80 hover:bg-slate-950 border border-slate-800/90 hover:border-cyan-500/50 transition group flex items-start justify-between gap-2">
+            <button data-lesson-id="${l.id}" class="mindmap-node w-full text-left p-3 rounded-xl bg-slate-950/80 hover:bg-slate-950 border border-slate-800/90 hover:border-cyan-500/50 transition group flex items-start justify-between gap-2.5">
               <div class="min-w-0">
-                <div class="flex items-center gap-1.5">
-                  <span class="text-[11px] font-mono text-cyan-400">${l.id}</span>
-                  <span class="text-xs font-medium text-slate-200 group-hover:text-white truncate">${l.title}</span>
+                <div class="flex items-center gap-2">
+                  <span class="text-[11px] font-mono text-cyan-400 font-semibold">${l.id}</span>
+                  <span class="text-xs font-medium text-slate-200 group-hover:text-white leading-snug">${l.title}</span>
                 </div>
-                <div class="text-[10px] font-mono text-slate-500 truncate mt-0.5">${l.file}${l.secondaryFile ? ' + 1 more' : ''}</div>
+                <p class="text-[11px] text-slate-400 line-clamp-1 mt-1">${l.summary}</p>
               </div>
-              <span class="shrink-0 text-[10px] font-mono px-1.5 py-0.5 rounded border ${badgeClass}">${tagText}</span>
+              <span class="shrink-0 text-[10px] font-mono px-2 py-0.5 rounded-md border ${badgeClass}">${tagText}</span>
             </button>
           `;
         });
@@ -1436,7 +1393,7 @@ git push -u origin main</pre>
           <div class="space-y-3">
             <div class="flex items-center justify-between">
               <span class="text-xs font-mono uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">${ch.number}</span>
-              <span class="text-xs font-mono text-slate-400">${haveCount}/${ch.lessons.length} HTML Ready</span>
+              <span class="text-xs font-mono text-slate-400">${filteredLessons.length} Lessons</span>
             </div>
             <div>
               <h3 class="text-base font-bold text-white">${ch.title}</h3>
@@ -1457,54 +1414,17 @@ git push -u origin main</pre>
       });
     }
 
-    // Render Missing Topics View
-    function renderMissingTopics() {
-      const grid = document.getElementById('missingCardsGrid');
-      grid.innerHTML = '';
-      const missing = ALL_LESSONS.filter(l => l.status === 'missing');
-
-      missing.forEach((l, idx) => {
-        const card = document.createElement('div');
-        card.className = 'rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-3 flex flex-col justify-between';
-        card.innerHTML = `
-          <div class="space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-mono text-amber-400 bg-amber-500/10 border border-amber-500/30 px-2.5 py-0.5 rounded-full">
-                Missing Topic #${idx + 1} • ${l.chapterNumber} (${l.id})
-              </span>
-              <span class="text-xs font-mono text-slate-400">${l.file}</span>
-            </div>
-            <h3 class="text-base font-bold text-white">${l.title}</h3>
-            <p class="text-xs text-slate-300 leading-relaxed">${l.summary}</p>
-            <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 text-[11px] font-mono text-cyan-300">
-              Equation to visualize: ${l.equation}
-            </div>
-          </div>
-          <div class="pt-2 flex items-center justify-between">
-            <span class="text-[11px] text-slate-400">Built-in interactive demo included in Lesson ${l.id}</span>
-            <button data-open-missing="${l.id}" class="px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 text-xs font-medium transition">
-              Preview Lesson &amp; Demo →
-            </button>
-          </div>
-        `;
-        grid.appendChild(card);
-      });
-
-      grid.querySelectorAll('[data-open-missing]').forEach(btn => {
-        btn.addEventListener('click', () => openLesson(btn.getAttribute('data-open-missing')));
-      });
-    }
-
     // Open Specific Lesson
     function openLesson(lessonId) {
       const lesson = ALL_LESSONS.find(l => l.id === lessonId) || ALL_LESSONS[0];
       currentLessonId = lesson.id;
       activeSecondaryFile = false;
       switchView('lesson');
-      renderSidebar();
 
-      document.getElementById('lessonChapterBadge').textContent = lesson.chapterNumber + ': ' + lesson.chapterTitle;
-      document.getElementById('lessonCodeBadge').textContent = 'Lesson ' + lesson.id;
+      const sel = document.getElementById('lessonQuickSelect');
+      if (sel) sel.value = lesson.id;
+
+      document.getElementById('lessonChapterBadge').textContent = lesson.chapterNumber + ' — ' + lesson.chapterTitle;
       document.getElementById('lessonTitle').textContent = lesson.id + ' — ' + lesson.title;
       document.getElementById('lessonSummary').textContent = lesson.summary;
       document.getElementById('lessonTheoryText').textContent = lesson.theory;
@@ -1512,14 +1432,14 @@ git push -u origin main</pre>
       document.getElementById('lessonEquationDesc').textContent = lesson.equationDesc;
       document.getElementById('lessonMissionText').textContent = lesson.mission;
 
-      // Status Pill & File Pill
+      // Status Pill
       const statusPill = document.getElementById('lessonStatusPill');
       if (lesson.status === 'have') {
         statusPill.className = 'px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-300 border border-emerald-500/30';
-        statusPill.textContent = '✓ Existing HTML Illustration (In Your 20 Files)';
+        statusPill.textContent = 'Interactive Simulation';
       } else {
-        statusPill.className = 'px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/15 text-amber-300 border border-amber-500/30';
-        statusPill.textContent = '★ Recommended New Illustration (Built-In Demo Ready)';
+        statusPill.className = 'px-2.5 py-0.5 rounded-full text-xs font-medium bg-cyan-500/15 text-cyan-300 border border-cyan-500/30';
+        statusPill.textContent = 'Interactive Concept Explorer';
       }
 
       updateSimulationFileBinding(lesson);
@@ -1542,8 +1462,8 @@ git push -u origin main</pre>
         const toggleDiv = document.createElement('li');
         toggleDiv.className = 'p-3 rounded-xl bg-cyan-950/30 border border-cyan-500/30 flex items-center justify-between gap-2';
         toggleDiv.innerHTML = `
-          <span class="text-xs text-cyan-200"><strong>Dual Simulation Lesson:</strong> This lesson pairs <code class="mono">${lesson.file}</code> and <code class="mono">${lesson.secondaryFile}</code>.</span>
-          <button id="toggleSecondaryFileBtn" class="px-3 py-1 rounded-lg bg-cyan-500 text-slate-950 font-semibold text-xs shrink-0">Switch HTML File</button>
+          <span class="text-xs text-cyan-200"><strong>Two Interactive Simulations Available:</strong> Switch between Spectral Diversity and Sentinel-1 Enhanced Spectral Diversity (ESD).</span>
+          <button id="toggleSecondaryFileBtn" class="px-3 py-1 rounded-lg bg-cyan-500 text-slate-950 font-semibold text-xs shrink-0">Switch Simulation</button>
         `;
         exList.prepend(toggleDiv);
         setTimeout(() => {
@@ -1552,7 +1472,7 @@ git push -u origin main</pre>
             tBtn.addEventListener('click', () => {
               activeSecondaryFile = !activeSecondaryFile;
               updateSimulationFileBinding(lesson);
-              showToast('Switched bound HTML file to: ' + (activeSecondaryFile ? lesson.secondaryFile : lesson.file));
+              showToast('Loaded: ' + (activeSecondaryFile ? lesson.secondaryFile : lesson.file));
             });
           }
         }, 0);
@@ -1577,7 +1497,7 @@ git push -u origin main</pre>
             completedLessons[lesson.id] = true;
             saveProgress();
             updateCompleteBtnUI();
-            renderSidebar();
+            renderMindMap();
           } else {
             qFeed.className = 'text-xs p-2.5 rounded-lg border bg-rose-500/15 border-rose-500/40 text-rose-300';
             qFeed.textContent = 'Not quite — check the governing equation and try again.';
@@ -1597,7 +1517,13 @@ git push -u origin main</pre>
 
       updateCompleteBtnUI();
       setupInteractiveDemo(lesson);
-      setSimMode(currentSimMode);
+
+      // Default to external simulation iframe for the 20 existing HTML files, and built-in explorer for the 8 concept modules
+      if (lesson.status === 'have') {
+        setSimMode('iframe');
+      } else {
+        setSimMode('sandbox');
+      }
     }
 
     function updateSimulationFileBinding(lesson) {
@@ -1605,9 +1531,8 @@ git push -u origin main</pre>
       const relativeUrl = 'simulations/' + encodeURIComponent(targetFile).replace(/%20/g, ' ');
       const encodedHref = 'simulations/' + encodeURIComponent(targetFile);
 
-      document.getElementById('lessonFilePill').textContent = relativeUrl;
-      document.getElementById('frameTitleBar').textContent = relativeUrl;
-      document.getElementById('iframeTargetCode').textContent = relativeUrl;
+      document.getElementById('lessonFilePill').textContent = targetFile;
+      document.getElementById('frameTitleBar').textContent = lesson.title;
       document.getElementById('openStandaloneLink').setAttribute('href', encodedHref);
       const iframe = document.getElementById('simulationIframe');
       if (iframe) iframe.setAttribute('src', encodedHref);
@@ -1624,7 +1549,7 @@ git push -u origin main</pre>
       } else {
         icon.className = 'w-3.5 h-3.5 rounded border border-slate-500 inline-flex items-center justify-center';
         icon.textContent = '';
-        txt.textContent = 'Mark Lesson Complete';
+        txt.textContent = 'Mark Complete';
       }
     }
 
@@ -1649,7 +1574,7 @@ git push -u origin main</pre>
       }
     }
 
-    // Built-in HTML5 Canvas Interactive Visualizer for all 28 lessons
+    // Built-in HTML5 Canvas Interactive Visualizer
     let currentDemoConfig = null;
     function setupInteractiveDemo(lesson) {
       const s1 = document.getElementById('slider1');
@@ -1726,7 +1651,6 @@ git push -u origin main</pre>
       const type = currentDemoConfig || 'phase';
 
       if (type === 'antenna' || type === 'sinc') {
-        // Plot Sinc / Antenna pattern
         const freq = 0.02 + (v1 / 100) * 0.08;
         const taper = v2 / 100;
         const steer = ((v3 - 50) / 50) * 80;
@@ -1743,12 +1667,10 @@ git push -u origin main</pre>
         }
         ctx.stroke();
 
-        // Zero axis
         ctx.strokeStyle = 'rgba(148, 163, 184, 0.4)';
         ctx.beginPath(); ctx.moveTo(0, h * 0.68); ctx.lineTo(w, h * 0.68); ctx.stroke();
         readout.textContent = `Main-lobe width ∝ ${(100 / Math.max(10, v1)).toFixed(2)}° | Sidelobe suppression: -${(13 + v2 * 0.25).toFixed(1)} dB`;
       } else if (type === 'fringes' || type === 'tops') {
-        // 2D Interferometric Fringes Strip + Wrapped Phase Profile
         const rate = 0.03 + (v1 / 100) * 0.12;
         const def = (v2 / 100) * 6;
         const noise = (v3 / 100) * 1.8;
@@ -1763,7 +1685,6 @@ git push -u origin main</pre>
           ctx.fillRect(x, 24, 3, stripH);
         }
 
-        // Wrapped sawtooth profile below
         ctx.beginPath();
         ctx.strokeStyle = '#34d399';
         ctx.lineWidth = 2;
@@ -1777,7 +1698,6 @@ git push -u origin main</pre>
         ctx.stroke();
         readout.textContent = `Wrapped [-π, +π) Fringe Cycles: ${(w * rate / (2 * Math.PI)).toFixed(1)} | Coherence γ ≈ ${(1 - v3 / 120).toFixed(2)}`;
       } else if (type === 'phase' || type === 'vector') {
-        // Complex I/Q Phasor Circle + Wave
         const cx = 110, cy = h / 2, rad = 75;
         ctx.strokeStyle = '#475569';
         ctx.lineWidth = 1.5;
@@ -1793,7 +1713,6 @@ git push -u origin main</pre>
         ctx.fillStyle = '#34d399';
         ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI * 2); ctx.fill();
 
-        // Wave on right
         ctx.beginPath();
         ctx.strokeStyle = '#38bdf8';
         ctx.lineWidth = 2;
@@ -1805,7 +1724,6 @@ git push -u origin main</pre>
         ctx.stroke();
         readout.textContent = `Δφ = ${((angle % (2 * Math.PI)).toFixed(2))} rad | I = ${Math.cos(angle).toFixed(2)}, Q = ${Math.sin(angle).toFixed(2)}`;
       } else {
-        // 2D Cross-Correlation Peak / Grid / Speckle / Network
         const cx = w / 2 + ((v1 - 50) * 1.2);
         const cy = h / 2 + ((v2 - 50) * 0.8);
         for (let r = 90; r > 8; r -= 14) {
@@ -1821,21 +1739,10 @@ git push -u origin main</pre>
       }
     }
 
-    // Mobile Sidebar Controls
-    function openMobileSidebar() {
-      document.getElementById('sidebar').classList.remove('-translate-x-full');
-      document.getElementById('sidebarBackdrop').classList.remove('hidden');
-    }
-    function closeMobileSidebar() {
-      document.getElementById('sidebar').classList.add('-translate-x-full');
-      document.getElementById('sidebarBackdrop').classList.add('hidden');
-    }
-
     // Wire All Event Listeners on Load
     window.addEventListener('DOMContentLoaded', () => {
-      renderSidebar();
+      populateLessonSelect();
       renderMindMap();
-      renderMissingTopics();
       updateProgressUI();
 
       // Top nav tabs
@@ -1853,28 +1760,29 @@ git push -u origin main</pre>
       });
 
       document.getElementById('startFirstLessonBtn').addEventListener('click', () => openLesson('1.2'));
-      document.getElementById('jumpToGapsBtn').addEventListener('click', () => switchView('gaps'));
-      document.getElementById('jumpToGithubBtn').addEventListener('click', () => switchView('github'));
-      document.getElementById('openGithubModalBtn').addEventListener('click', () => switchView('github'));
       document.getElementById('backToMapBtn').addEventListener('click', () => switchView('overview'));
 
-      // Filter chips
+      document.getElementById('lessonQuickSelect').addEventListener('change', (e) => {
+        openLesson(e.target.value);
+      });
+
+      // Filter chips on Contents grid
       document.querySelectorAll('.filter-chip').forEach(btn => {
         btn.addEventListener('click', () => {
-          sidebarFilter = btn.getAttribute('data-filter');
+          contentFilter = btn.getAttribute('data-filter');
           document.querySelectorAll('.filter-chip').forEach(c => {
-            const active = c.getAttribute('data-filter') === sidebarFilter;
-            c.className = 'filter-chip flex-1 py-1 rounded-md text-[11px] font-medium ' +
-              (active ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40' : 'bg-slate-800 text-slate-400 hover:text-slate-200 border border-transparent');
+            const active = c.getAttribute('data-filter') === contentFilter;
+            c.className = 'filter-chip px-2.5 py-1 rounded-lg text-[11px] font-medium ' +
+              (active ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40' : 'text-slate-400 hover:text-slate-200 border border-transparent');
           });
-          renderSidebar();
+          renderMindMap();
         });
       });
 
-      // Search input
+      // Search input on Contents grid
       document.getElementById('searchInput').addEventListener('input', (e) => {
         searchQuery = e.target.value.trim();
-        renderSidebar();
+        renderMindMap();
       });
 
       // Lesson controls
@@ -1882,7 +1790,7 @@ git push -u origin main</pre>
         completedLessons[currentLessonId] = !completedLessons[currentLessonId];
         saveProgress();
         updateCompleteBtnUI();
-        renderSidebar();
+        renderMindMap();
       });
 
       document.getElementById('prevLessonBtn').addEventListener('click', () => {
@@ -1898,7 +1806,6 @@ git push -u origin main</pre>
       // Mode buttons
       document.getElementById('modeIframeBtn').addEventListener('click', () => setSimMode('iframe'));
       document.getElementById('modeSandboxBtn').addEventListener('click', () => setSimMode('sandbox'));
-      document.getElementById('switchToDemoBtn').addEventListener('click', () => setSimMode('sandbox'));
 
       // Sliders
       ['slider1', 'slider2', 'slider3'].forEach(id => {
@@ -1907,22 +1814,6 @@ git push -u origin main</pre>
 
       window.addEventListener('resize', () => {
         if (currentView === 'lesson' && currentSimMode === 'sandbox') drawInteractiveCanvas();
-      });
-
-      // Mobile menu
-      document.getElementById('mobileMenuBtn').addEventListener('click', openMobileSidebar);
-      document.getElementById('sidebarBackdrop').addEventListener('click', closeMobileSidebar);
-
-      // Copy Git commands
-      document.getElementById('copyGitCommandsBtn').addEventListener('click', () => {
-        const text = document.getElementById('gitCommandsBlock').textContent;
-        const ta = document.createElement('textarea');
-        ta.value = text;
-        document.body.appendChild(ta);
-        ta.select();
-        try { document.execCommand('copy'); } catch (e) {}
-        document.body.removeChild(ta);
-        showToast('Git commands copied to clipboard!');
       });
     });
   </script>
