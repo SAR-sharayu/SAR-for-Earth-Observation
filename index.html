@@ -1,0 +1,1930 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAR for Earth Observation — Interactive Curriculum & Lab</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.3); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.5); }
+    .mindmap-line { stroke-dasharray: 4 4; animation: dash 20s linear infinite; }
+    @keyframes dash { to { stroke-dashoffset: -100; } }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-cyan-500 selection:text-slate-950 overflow-x-hidden">
+
+  <!-- Top Navbar -->
+  <header class="sticky top-0 z-40 h-16 border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-md px-4 lg:px-6 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <button id="mobileMenuBtn" class="lg:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition" aria-label="Toggle Sidebar">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <a href="#view-overview" id="brandLink" class="flex items-center gap-3 group">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+          <svg class="w-5 h-5 text-slate-950" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.348 14.651a3.75 3.75 0 010-5.303m5.304 0a3.75 3.75 0 010 5.303m-7.425 2.122a6.75 6.75 0 010-9.546m9.546 0a6.75 6.75 0 010 9.546M5.106 18.894c-3.808-3.808-3.808-9.98 0-13.789m13.788 0c3.808 3.808 3.808 9.981 0 13.79M12 12h.008v.007H12V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
+          </svg>
+        </div>
+        <div>
+          <span class="font-bold tracking-tight text-white text-base sm:text-lg flex items-center gap-2">
+            SAR<span class="text-cyan-400">EO</span>
+            <span class="hidden sm:inline-block text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">Static HTML Portal</span>
+          </span>
+          <p class="text-xs text-slate-400 hidden sm:block">Synthetic Aperture Radar &amp; InSAR Interactive Curriculum</p>
+        </div>
+      </a>
+    </div>
+
+    <!-- Top Navigation Tabs -->
+    <nav class="hidden md:flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800">
+      <button data-nav="overview" class="nav-tab px-3.5 py-1.5 rounded-lg text-xs font-medium transition bg-cyan-500 text-slate-950 font-semibold">
+        Curriculum &amp; Mind Map
+      </button>
+      <button data-nav="lesson" class="nav-tab px-3.5 py-1.5 rounded-lg text-xs font-medium transition text-slate-300 hover:text-white">
+        Interactive Lessons (28)
+      </button>
+      <button data-nav="gaps" class="nav-tab px-3.5 py-1.5 rounded-lg text-xs font-medium transition text-slate-300 hover:text-white">
+        Missing Topics (8)
+      </button>
+      <button data-nav="github" class="nav-tab px-3.5 py-1.5 rounded-lg text-xs font-medium transition text-slate-300 hover:text-white">
+        GitHub Pages Setup
+      </button>
+    </nav>
+
+    <!-- Right Controls -->
+    <div class="flex items-center gap-2.5">
+      <div class="hidden sm:flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5">
+        <span class="text-xs text-slate-400">Progress:</span>
+        <span id="progressBadge" class="text-xs font-mono font-semibold text-emerald-400">0 / 28</span>
+      </div>
+      <button id="openGithubModalBtn" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1.5">
+        <svg class="w-4 h-4 text-cyan-400" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+        <span class="hidden sm:inline">Push to GitHub</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Secondary Nav -->
+  <div class="md:hidden flex items-center gap-1 bg-slate-900/95 px-3 py-2 border-b border-slate-800 overflow-x-auto">
+    <button data-nav="overview" class="nav-tab px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap bg-cyan-500 text-slate-950 font-semibold">Mind Map</button>
+    <button data-nav="lesson" class="nav-tab px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap text-slate-300">Lessons (28)</button>
+    <button data-nav="gaps" class="nav-tab px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap text-slate-300">Missing (8)</button>
+    <button data-nav="github" class="nav-tab px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap text-slate-300">GitHub Guide</button>
+  </div>
+
+  <!-- Main Workspace Container -->
+  <div class="flex-1 flex relative">
+
+    <!-- Left Curriculum Sidebar -->
+    <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-30 w-80 bg-slate-900/95 lg:bg-slate-900/60 border-r border-slate-800/80 flex flex-col transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out pt-16 lg:pt-0">
+      <!-- Search & Filter -->
+      <div class="p-3.5 border-b border-slate-800/80 space-y-2.5">
+        <div class="relative">
+          <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <input id="searchInput" type="text" placeholder="Search 28 lessons or HTML files..." class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-lg pl-9 pr-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none">
+        </div>
+        <div class="flex items-center gap-1.5">
+          <button data-filter="all" class="filter-chip flex-1 py-1 rounded-md text-[11px] font-medium bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">All (28)</button>
+          <button data-filter="have" class="filter-chip flex-1 py-1 rounded-md text-[11px] font-medium bg-slate-800 text-slate-400 hover:text-slate-200 border border-transparent">Ready (20)</button>
+          <button data-filter="missing" class="filter-chip flex-1 py-1 rounded-md text-[11px] font-medium bg-slate-800 text-slate-400 hover:text-slate-200 border border-transparent">To Build (8)</button>
+        </div>
+      </div>
+
+      <!-- Chapters Accordion List -->
+      <div id="chapterList" class="flex-1 overflow-y-auto p-3 space-y-3"></div>
+
+      <!-- Sidebar Footer -->
+      <div class="p-3 border-t border-slate-800/80 bg-slate-950/60 text-[11px] text-slate-400 flex items-center justify-between">
+        <span>Pure Static HTML5 • No Build Step</span>
+        <span class="font-mono text-cyan-400">v1.0</span>
+      </div>
+    </aside>
+
+    <!-- Backdrop for mobile sidebar -->
+    <div id="sidebarBackdrop" class="fixed inset-0 bg-black/60 z-20 hidden lg:hidden"></div>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 min-w-0 overflow-y-auto p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto w-full">
+
+      <!-- VIEW 1: OVERVIEW & INTERACTIVE MIND MAP -->
+      <section id="view-overview" class="space-y-8">
+        <!-- Hero Banner -->
+        <div class="rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-cyan-950/40 border border-slate-800 p-6 sm:p-8 relative overflow-hidden">
+          <div class="max-w-3xl space-y-4 relative z-10">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-medium">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              20 Interactive HTML Simulations Mapped • 6 Chapters
+            </div>
+            <h1 class="text-2xl sm:text-4xl font-bold text-white tracking-tight">
+              Synthetic Aperture Radar for Earth Observation
+            </h1>
+            <p class="text-sm sm:text-base text-slate-300 leading-relaxed">
+              Welcome to your plain-HTML static course shell. Every chapter below organizes your 20 standalone HTML simulations into a logical learning path—from radar beamforming and complex phase signals to Sentinel-1 TOPS co-registration and multi-temporal InSAR phase linking.
+            </p>
+            <div class="flex flex-wrap gap-3 pt-2">
+              <button id="startFirstLessonBtn" class="px-4 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold text-xs sm:text-sm transition shadow-lg shadow-cyan-500/20 flex items-center gap-2">
+                <span>Launch Lesson 1.1</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+              </button>
+              <button id="jumpToGapsBtn" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-100 font-medium text-xs sm:text-sm border border-slate-700 transition">
+                View 8 Missing Illustrations to Add
+              </button>
+              <button id="jumpToGithubBtn" class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 font-medium text-xs sm:text-sm border border-slate-800 transition">
+                How to Drop Your 20 Files &amp; Push to GitHub
+              </button>
+            </div>
+          </div>
+
+          <!-- Stats Row -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-8 pt-6 border-t border-slate-800/80">
+            <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-3.5">
+              <div class="text-xs text-slate-400">Total Chapters</div>
+              <div class="text-xl font-bold text-white mt-0.5">6 Modules</div>
+              <div class="text-[11px] text-cyan-400 mt-1">Physics → PolSAR &amp; EO</div>
+            </div>
+            <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-3.5">
+              <div class="text-xs text-slate-400">Your HTML Files</div>
+              <div class="text-xl font-bold text-emerald-400 mt-0.5">20 Ready</div>
+              <div class="text-[11px] text-slate-400 mt-1">Auto-wired via &lt;iframe&gt;</div>
+            </div>
+            <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-3.5">
+              <div class="text-xs text-slate-400">Recommended Additions</div>
+              <div class="text-xl font-bold text-amber-400 mt-0.5">8 Topics</div>
+              <div class="text-[11px] text-slate-400 mt-1">Geometry, Chirp, Unwrapping</div>
+            </div>
+            <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-3.5">
+              <div class="text-xs text-slate-400">Hosting Stack</div>
+              <div class="text-xl font-bold text-indigo-400 mt-0.5">100% HTML</div>
+              <div class="text-[11px] text-slate-400 mt-1">Zero Node/Python build needed</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Visual Interactive Curriculum Mind Map -->
+        <div class="space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h2 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+                <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+                Interactive Course Mind Map
+              </h2>
+              <p class="text-xs text-slate-400">Click any lesson node below to open its interactive lesson page, equations, and simulation container.</p>
+            </div>
+            <div class="flex items-center gap-4 text-xs">
+              <span class="flex items-center gap-1.5 text-emerald-400"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span> Have HTML (20)</span>
+              <span class="flex items-center gap-1.5 text-amber-400"><span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span> Needed HTML (8)</span>
+            </div>
+          </div>
+
+          <div id="mindMapGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+        </div>
+      </section>
+
+      <!-- VIEW 2: LESSON VIEWER (IFRAME + BUILT-IN LIVE PREVIEW + THEORY) -->
+      <section id="view-lesson" class="hidden space-y-6">
+        <!-- Breadcrumb & Navigation Controls -->
+        <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-800">
+          <div class="flex items-center gap-2 text-xs text-slate-400">
+            <button id="backToMapBtn" class="hover:text-cyan-400 transition flex items-center gap-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+              Mind Map
+            </button>
+            <span>/</span>
+            <span id="lessonChapterBadge" class="text-slate-300 font-medium">Chapter 1</span>
+            <span>/</span>
+            <span id="lessonCodeBadge" class="text-cyan-400 font-mono">1.2</span>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button id="markCompleteBtn" class="px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-200 transition flex items-center gap-1.5">
+              <span id="markCompleteIcon" class="w-3.5 h-3.5 rounded border border-slate-500 inline-flex items-center justify-center"></span>
+              <span id="markCompleteText">Mark Lesson Complete</span>
+            </button>
+            <button id="prevLessonBtn" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition">← Prev</button>
+            <button id="nextLessonBtn" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition">Next →</button>
+          </div>
+        </div>
+
+        <!-- Lesson Title & File Header -->
+        <div class="space-y-3">
+          <div class="flex flex-wrap items-center gap-2">
+            <span id="lessonStatusPill" class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+              ✓ Existing HTML Illustration
+            </span>
+            <span class="text-xs font-mono text-slate-400 bg-slate-900 px-2.5 py-0.5 rounded border border-slate-800" id="lessonFilePill">
+              simulations/antenna_radiation_pattern.html
+            </span>
+          </div>
+          <h1 id="lessonTitle" class="text-2xl sm:text-3xl font-bold text-white tracking-tight"></h1>
+          <p id="lessonSummary" class="text-sm sm:text-base text-slate-300 leading-relaxed"></p>
+        </div>
+
+        <!-- Simulation Frame Container -->
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/70 overflow-hidden shadow-2xl">
+          <!-- Frame Toolbar -->
+          <div class="px-4 py-2.5 bg-slate-900 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
+              <span id="frameTitleBar" class="ml-2 text-xs font-mono text-slate-300 truncate max-w-xs sm:max-w-md"></span>
+            </div>
+
+            <div class="flex items-center gap-1.5">
+              <button id="modeIframeBtn" class="px-2.5 py-1 rounded text-xs font-medium bg-cyan-500 text-slate-950 font-semibold transition">
+                External File (&lt;iframe&gt;)
+              </button>
+              <button id="modeSandboxBtn" class="px-2.5 py-1 rounded text-xs font-medium bg-slate-800 text-slate-300 hover:text-white transition">
+                Built-In Interactive Demo
+              </button>
+              <a id="openStandaloneLink" href="#" target="_blank" rel="noopener" class="px-2.5 py-1 rounded text-xs font-medium bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 transition flex items-center gap-1">
+                <span>Full Tab</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Mode A: External HTML File Iframe (for GitHub Pages / local folder) -->
+          <div id="externalIframeContainer" class="relative bg-slate-950" style="min-height: 460px;">
+            <iframe id="simulationIframe" class="w-full h-[500px] border-0" title="SAR Interactive Simulation"></iframe>
+            <!-- Helpful overlay banner explaining how external files load once placed in /simulations/ -->
+            <div id="iframeHelperBanner" class="bg-slate-900/95 border-t border-slate-800 px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="text-xs text-slate-300">
+                <strong class="text-cyan-400">GitHub Folder Binding:</strong> This <code class="mono text-amber-300">&lt;iframe&gt;</code> points directly to <code id="iframeTargetCode" class="mono text-emerald-300"></code>. Drop your 20 HTML files into the <code class="mono">simulations/</code> folder in your repo and they load here automatically! Want to interact right now inside this preview?
+              </div>
+              <button id="switchToDemoBtn" class="shrink-0 px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 text-xs font-medium transition">
+                Switch to Built-In Interactive Demo →
+              </button>
+            </div>
+          </div>
+
+          <!-- Mode B: Built-in Interactive Canvas Simulation (works immediately in Canvas preview) -->
+          <div id="builtinDemoContainer" class="hidden p-5 bg-slate-950 space-y-4">
+            <div class="flex flex-col lg:flex-row gap-5 items-stretch">
+              <div class="flex-1 bg-slate-900 border border-slate-800 rounded-xl p-3 flex flex-col">
+                <div class="flex items-center justify-between mb-2">
+                  <span id="demoCanvasTitle" class="text-xs font-mono uppercase tracking-wider text-cyan-400">Interactive Signal &amp; Phase Visualizer</span>
+                  <span id="demoReadout" class="text-xs font-mono text-emerald-400"></span>
+                </div>
+                <div class="relative flex-1 min-h-[280px] flex items-center justify-center">
+                  <canvas id="interactiveCanvas" class="w-full h-[280px] rounded-lg bg-slate-950"></canvas>
+                </div>
+              </div>
+
+              <!-- Interactive Sliders -->
+              <div class="w-full lg:w-72 bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between space-y-4">
+                <div class="space-y-4">
+                  <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-400">Simulation Parameters</h4>
+                  <div>
+                    <div class="flex justify-between text-xs mb-1">
+                      <span id="slider1Label" class="text-slate-300">Parameter 1</span>
+                      <span id="slider1Val" class="font-mono text-cyan-400">50</span>
+                    </div>
+                    <input id="slider1" type="range" min="1" max="100" value="50" class="w-full accent-cyan-400 cursor-pointer">
+                  </div>
+                  <div>
+                    <div class="flex justify-between text-xs mb-1">
+                      <span id="slider2Label" class="text-slate-300">Parameter 2</span>
+                      <span id="slider2Val" class="font-mono text-cyan-400">35</span>
+                    </div>
+                    <input id="slider2" type="range" min="1" max="100" value="35" class="w-full accent-cyan-400 cursor-pointer">
+                  </div>
+                  <div>
+                    <div class="flex justify-between text-xs mb-1">
+                      <span id="slider3Label" class="text-slate-300">Noise / Decorrelation</span>
+                      <span id="slider3Val" class="font-mono text-cyan-400">15</span>
+                    </div>
+                    <input id="slider3" type="range" min="0" max="100" value="15" class="w-full accent-cyan-400 cursor-pointer">
+                  </div>
+                </div>
+
+                <div class="p-3 rounded-lg bg-slate-950 border border-slate-800/80 text-[11px] text-slate-400 leading-relaxed">
+                  <strong class="text-slate-200 block mb-0.5">Live Concept Preview:</strong>
+                  <span id="demoExplanationText">Adjust the sliders above to inspect how radar phase, coherence, and spatial resampling respond in real time.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lesson Content Grid: Concepts, Math & Guided Exercises -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Left 2 Columns: Theory & Guided Lab -->
+          <div class="lg:col-span-2 space-y-6">
+            <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 sm:p-6 space-y-3">
+              <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <span class="w-2 h-5 rounded bg-cyan-400"></span>
+                Physical Intuition &amp; Earth Observation Context
+              </h3>
+              <p id="lessonTheoryText" class="text-sm text-slate-300 leading-relaxed"></p>
+            </div>
+
+            <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 sm:p-6 space-y-4">
+              <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <span class="w-2 h-5 rounded bg-emerald-400"></span>
+                Guided Interactive Exploration Tasks
+              </h3>
+              <ul id="lessonExercisesList" class="space-y-2.5 text-sm text-slate-300"></ul>
+            </div>
+          </div>
+
+          <!-- Right Column: Key Equation, Mission Tie-In & Quick Quiz -->
+          <div class="space-y-6">
+            <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-3">
+              <h3 class="text-xs font-mono uppercase tracking-wider text-cyan-400">Governing Equation</h3>
+              <div id="lessonEquationBox" class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 font-mono text-xs sm:text-sm text-amber-300 overflow-x-auto"></div>
+              <p id="lessonEquationDesc" class="text-xs text-slate-400 leading-relaxed"></p>
+            </div>
+
+            <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-3">
+              <h3 class="text-xs font-mono uppercase tracking-wider text-indigo-400">Satellite Mission Benchmark</h3>
+              <p id="lessonMissionText" class="text-xs text-slate-300 leading-relaxed"></p>
+            </div>
+
+            <!-- Self-Check Question -->
+            <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-3">
+              <h3 class="text-xs font-mono uppercase tracking-wider text-emerald-400">Concept Check</h3>
+              <p id="quizQuestion" class="text-xs font-medium text-white leading-relaxed"></p>
+              <div id="quizOptions" class="space-y-2 pt-1"></div>
+              <div id="quizFeedback" class="hidden text-xs p-2.5 rounded-lg border"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 3: MISSING ILLUSTRATIONS & MATERIALS CHECKLIST -->
+      <section id="view-gaps" class="hidden space-y-6">
+        <div class="rounded-2xl bg-slate-900/70 border border-slate-800 p-6 space-y-3">
+          <span class="text-xs font-mono uppercase tracking-wider text-amber-400">Curriculum Gap Analysis</span>
+          <h2 class="text-2xl font-bold text-white">8 Missing Illustrations &amp; Supporting Course Materials</h2>
+          <p class="text-sm text-slate-300 max-w-3xl leading-relaxed">
+            Your 20 existing HTML files cover advanced resampling, Sentinel-1 TOPS co-registration, and InSAR/DInSAR thoroughly. To make your site welcoming for beginners and complete for Earth Observation applications, here are the 8 missing HTML simulations and supporting materials to add next.
+          </p>
+        </div>
+
+        <div id="missingCardsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+
+        <!-- Additional Materials Checklist -->
+        <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-6 space-y-4">
+          <h3 class="text-lg font-bold text-white">Other Course Materials to Pair with Your HTML Files</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+            <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5">
+              <div class="font-semibold text-cyan-400">1. Real Sentinel-1 &amp; NISAR Snapshots</div>
+              <p class="text-slate-400 leading-relaxed">Include 1 static real satellite image per lesson (e.g., Ridgecrest earthquake fringes, Amazon deforestation RGB) so students connect synthetic sliders to real SAR data.</p>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5">
+              <div class="font-semibold text-emerald-400">2. Formula Variable Dictionary</div>
+              <p class="text-slate-400 leading-relaxed">Keep notation uniform across all 20 HTML files: use λ for wavelength, θ for incidence angle, B⊥ for perpendicular baseline, and γ for coherence.</p>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5">
+              <div class="font-semibold text-amber-400">3. Guided Mini-Experiments</div>
+              <p class="text-slate-400 leading-relaxed">Give learners 3 concrete slider challenges beneath every HTML widget (already pre-written for all 28 lessons in this static site!).</p>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5">
+              <div class="font-semibold text-indigo-400">4. Open-Source Python Links</div>
+              <p class="text-slate-400 leading-relaxed">Link chapters to ESA SNAP, ISCE2, MintPy, and PyGMTSAR workflows for students ready to process real SLC stacks.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 4: GITHUB PAGES DEPLOYMENT & FOLDER GUIDE -->
+      <section id="view-github" class="hidden space-y-6">
+        <div class="rounded-2xl bg-slate-900/70 border border-slate-800 p-6 space-y-3">
+          <span class="text-xs font-mono uppercase tracking-wider text-cyan-400">Zero-Dependency Deployment</span>
+          <h2 class="text-2xl font-bold text-white">How to Host This Basic HTML Site on GitHub Pages</h2>
+          <p class="text-sm text-slate-300 max-w-3xl leading-relaxed">
+            Because this website is built in **pure static HTML/CSS/JS**, you don't need Node.js, Webpack, Vite, or any build pipeline. Just place this <code class="mono text-cyan-300">index.html</code> in your repository root and drop your 20 existing HTML files into a <code class="mono text-cyan-300">simulations/</code> subfolder.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Folder Layout -->
+          <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-bold text-white">1. Exact Folder Structure</h3>
+              <span class="text-[11px] font-mono text-emerald-400">Works with exact filenames from your screenshot</span>
+            </div>
+            <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-slate-300 overflow-x-auto leading-relaxed">your-github-repo/
+├── index.html   &lt;-- (This static website shell)
+├── README.md
+└── simulations/ &lt;-- (Put your 20 HTML files here)
+    ├── 3-Pass Differential InSAR.html
+    ├── antenna_radiation_pattern.html
+    ├── grid_interpolator.html
+    ├── InSAR Phase-to-Displacement Vector Calculator.html
+    ├── InSAR Radar Path Length and Phase Shift.html
+    ├── InSAR Spatial Phase Coherence.html
+    ├── InSAR Spectral Diversity.html
+    ├── InSAR Topographic Acquisition and Fringes.html
+    ├── InSAR Topographic Phase Subtraction.html
+    ├── Joint InSAR Image Co-Registration.html
+    ├── Phase Linking InSAR Denoising.html
+    ├── SAR Coregistration Pipeline.html
+    ├── SAR Image Co-Registration Peak.html
+    ├── SAR Image Grid Spatial Alignment and Resampling.html
+    ├── SAR Phase Signal Processing.html
+    ├── SAR speckle filtering mechancism.html
+    ├── SAR_multiptemporal_RGB_pipeline.html
+    ├── Sentinel-1 Enhanced Spectral Diversity.html
+    ├── Sentinel-1 TOPS Coregistration.html
+    └── Sinc Sub-Pixel Signal Reconstruction.html</pre>
+          </div>
+
+          <!-- Git Commands -->
+          <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-bold text-white">2. Git Commands to Push &amp; Publish</h3>
+              <button id="copyGitCommandsBtn" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs font-mono text-cyan-300 border border-slate-700 transition">
+                Copy Commands
+              </button>
+            </div>
+            <pre id="gitCommandsBlock" class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-emerald-300 overflow-x-auto leading-relaxed"># 1. Inside your project folder, create the simulations subfolder
+mkdir simulations
+
+# 2. Move your 20 HTML illustrations into simulations/
+# (Keep index.html in the root folder)
+
+# 3. Initialize Git and push to GitHub
+git init
+git add .
+git commit -m "Initial commit: SAR EO interactive website and 20 simulations"
+git branch -M main
+git remote add origin https://github.com/YOUR-USERNAME/YOUR-REPO-NAME.git
+git push -u origin main</pre>
+
+            <div class="p-4 rounded-xl bg-cyan-950/30 border border-cyan-500/30 space-y-2 text-xs text-slate-300">
+              <div class="font-semibold text-cyan-300">3. Enable GitHub Pages (Takes 30 Seconds):</div>
+              <ol class="list-decimal list-inside space-y-1 text-slate-300">
+                <li>Open your repository on GitHub and click <strong>Settings → Pages</strong>.</li>
+                <li>Under <strong>Build and deployment → Source</strong>, select <strong>Deploy from a branch</strong>.</li>
+                <li>Choose branch <code class="mono text-white">main</code> and folder <code class="mono text-white">/ (root)</code>, then click <strong>Save</strong>.</li>
+                <li>Your live site will be published at <code class="mono text-cyan-300">https://YOUR-USERNAME.github.io/YOUR-REPO-NAME/</code>!</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden px-4 py-2.5 rounded-xl bg-slate-900 border border-cyan-500/50 text-xs text-white shadow-xl"></div>
+
+  <script>
+    // Complete Curriculum Data (20 Existing + 8 Recommended Additions)
+    const CHAPTERS = [
+      {
+        id: 'ch1',
+        number: 'Chapter 1',
+        title: 'Radar Physics & SAR Signal Formation',
+        subtitle: 'Viewing geometry, antenna beamforming, chirp compression & complex phase',
+        lessons: [
+          {
+            id: '1.1',
+            title: 'Side-Looking Radar Geometry & Terrain Distortions',
+            status: 'missing',
+            file: 'sar_geometry_distortions.html',
+            demoType: 'geometry',
+            summary: 'Why imaging radars must look sideways and how slant-range measurement creates foreshortening, layover, and shadow over mountains.',
+            theory: 'Unlike optical sensors that measure angles, radar is a ranging instrument that measures two-way travel time. If a radar pointed straight down (nadir), echoes from equidistant points on the left and right would arrive simultaneously, causing left-right ambiguity. Side-looking geometry resolves this, but projects 3D topography onto a 1D slant-range axis—compressing slopes facing the radar (foreshortening), inverting steep peaks (layover), and hiding back-slopes (shadow).',
+            equation: 'R_g = R_s / sin(θ_i)   |   ΔR_g = c / (2 · B · sin(θ_i))',
+            equationDesc: 'Ground range resolution (ΔR_g) improves at steeper incidence angles (θ_i) only up to the point where foreshortening and layover dominate.',
+            mission: 'Sentinel-1 IW mode operates across incidence angles from 29° to 46°, while NISAR L-band spans 33° to 47°.',
+            exercises: [
+              'Increase terrain slope angle α toward the radar incidence angle θ_i to observe the transition from foreshortening to layover.',
+              'Compare near-range vs. far-range ground resolution cell size.',
+              'Identify regions where back-slope exceeds look angle to form radar shadow.'
+            ],
+            quiz: {
+              q: 'When does radar layover occur on a mountain slope facing the sensor?',
+              options: [
+                'When the terrain slope angle exceeds the radar local incidence angle (α > θ)',
+                'When the surface roughness is smaller than the radar wavelength',
+                'Only when flying in descending orbit at night'
+              ],
+              answer: 0
+            }
+          },
+          {
+            id: '1.2',
+            title: 'Antenna Radiation Pattern & Beamforming',
+            status: 'have',
+            file: 'antenna_radiation_pattern.html',
+            demoType: 'antenna',
+            summary: 'Explore how physical antenna length, wavelength, and aperture weighting control main-lobe beamwidth and sidelobe suppression.',
+            theory: 'The far-field radiation pattern of a phased-array or rectangular SAR antenna is the Fourier transform of its aperture illumination function. A uniform illumination produces a sinc² power pattern with a narrow main lobe (β ≈ λ / L) but high first sidelobes (-13.3 dB) that can leak energy from bright urban or mountain targets into adjacent azimuth/elevation angles.',
+            equation: 'G(θ) = | sin(π · (L/λ) · sin θ) / (π · (L/λ) · sin θ) |²',
+            equationDesc: 'Angular beamwidth is inversely proportional to electrical antenna length (L/λ). Larger antennas produce sharper beams.',
+            mission: 'Sentinel-1 uses a 12.3 m × 0.82 m phased-array C-band antenna with electronic beam steering across 3 TOPS sub-swaths.',
+            exercises: [
+              'Increase the aperture ratio L/λ and watch the main lobe narrow while additional sidelobe nulls appear.',
+              'Apply a Hamming or Kaiser taper to suppress sidelobes below -30 dB and note the slight broadening of the 3 dB main lobe.',
+              'Steer the phase gradient across elements to observe electronic beam steering.'
+            ],
+            quiz: {
+              q: 'How does doubling the physical length L of a real-aperture radar antenna affect its angular beamwidth?',
+              options: [
+                'It cuts the angular beamwidth in half (sharper beam)',
+                'It doubles the angular beamwidth (wider beam)',
+                'It leaves beamwidth unchanged but doubles wavelength'
+              ],
+              answer: 0
+            }
+          },
+          {
+            id: '1.3',
+            title: 'Range Pulse Compression & Chirp Matched Filtering',
+            status: 'missing',
+            file: 'range_pulse_compression.html',
+            demoType: 'sinc',
+            summary: 'How Linear Frequency Modulated (LFM) chirp waveforms achieve meter-scale range resolution without extreme peak transmit power.',
+            theory: 'To detect weak Earth echoes from 700 km orbit, a radar needs high pulse energy, which favors long pulses. However, raw range resolution requires short pulses. SAR solves this dilemma by transmitting a long pulse whose instantaneous frequency sweeps linearly across bandwidth B (a chirp), then correlating the echo with a complex conjugate reference replica (matched filter) to compress the energy into a narrow sinc peak of width 1/B.',
+            equation: 's(t) = rect(t/T_p) · exp(j·2π(f_0·t + ½·K·t²))   |   δR_s = c / (2·B)',
+            equationDesc: 'Slant-range resolution δR_s depends strictly on chirp bandwidth B, independent of pulse duration T_p.',
+            mission: 'TerraSAR-X Staring Spotlight uses a 300 MHz chirp bandwidth to achieve 0.5 m slant-range resolution.',
+            exercises: [
+              'Increase chirp bandwidth B from 20 MHz to 100 MHz and observe how two closely spaced point targets become resolved after matched filtering.',
+              'Inspect the time-bandwidth product (TBP) and peak SNR gain.',
+              'Apply windowing in the frequency domain to reduce range sidelobes.'
+            ],
+            quiz: {
+              q: 'What determines the slant-range resolution of a pulse-compressed SAR system?',
+              options: [
+                'The transmitted chirp bandwidth B',
+                'The physical length of the satellite solar panels',
+                'The satellite altitude above sea level'
+              ],
+              answer: 0
+            }
+          },
+          {
+            id: '1.4',
+            title: 'Doppler History & Synthetic Aperture Focusing',
+            status: 'missing',
+            file: 'synthetic_aperture_doppler.html',
+            demoType: 'phase',
+            summary: 'Synthesizing a multi-kilometer virtual antenna in space by coherently integrating Doppler phase histories along the satellite track.',
+            theory: 'As a SAR satellite approaches, passes abeam of, and recedes from a ground scatterer, the slant range varies parabolically over time. This creates a linear Doppler frequency modulation (an azimuth chirp). By recording both amplitude and phase of every pulse along the synthetic aperture length L_sa and applying an azimuth matched filter, SAR achieves fine azimuth resolution δ_az ≈ L_antenna / 2—independent of sensor altitude or wavelength!',
+            equation: 'f_D(t) = -(2 · v² / (λ · R_0)) · t   |   δ_az = L_ant / 2',
+            equationDesc: 'Smaller physical antennas illuminate a target for a longer synthetic aperture path, yielding finer azimuth resolution.',
+            mission: 'A 10 m spaceborne SAR antenna at 800 km altitude achieves ~5 m azimuth resolution by synthesizing a ~4 km virtual aperture.',
+            exercises: [
+              'Trace the hyperbolic range walk and quadratic phase history of a point scatterer as the sensor flies past.',
+              'Compare unfocused real-aperture strips against azimuth-compressed point targets.',
+              'Observe why smaller physical antennas widen the ground footprint and lengthen the synthetic integration time.'
+            ],
+            quiz: {
+              q: 'In stripmap SAR, how does theoretical azimuth resolution depend on satellite altitude R_0?',
+              options: [
+                'It is independent of altitude because the beam footprint grows proportionally with range',
+                'It degrades linearly with altitude',
+                'It degrades with the square of altitude'
+              ],
+              answer: 0
+            }
+          },
+          {
+            id: '1.5',
+            title: 'Complex SAR Signals & Phase Processing (SLC)',
+            status: 'have',
+            file: 'SAR Phase Signal Processing.html',
+            demoType: 'phase',
+            summary: 'Interactive I/Q complex phasor lab showing how Single Look Complex (SLC) pixels encode backscatter amplitude and sub-wavelength phase.',
+            theory: 'Every focused SAR pixel in a Single Look Complex (SLC) image is a complex number z = I + jQ = A·exp(jφ). The magnitude A = √(I² + Q²) reflects surface roughness, dielectric constant (moisture), and local slope, while the phase φ = atan2(Q, I) combines the random scattering phase within the resolution cell and the exact two-way electromagnetic path length modulo 2π.',
+            equation: 'z = I + jQ = A · exp(jφ),   φ = -(4π / λ) · R + φ_scat',
+            equationDesc: 'Even a millimeter change in range R rotates the complex phasor (I, Q) by a measurable angle when λ is centimeters.',
+            mission: 'All interferometric workflows (Sentinel-1 IW SLC, NISAR RSLC) require preserving full complex I/Q values prior to detection.',
+            exercises: [
+              'Drag the In-Phase (I) and Quadrature (Q) components to watch the complex phasor rotate across the unit circle.',
+              'Add a sub-wavelength path change Δr and observe the deterministic phase shift.',
+              'Compare single-scatterer deterministic phase against distributed-scatterer random phase walk.'
+            ],
+            quiz: {
+              q: 'Why does a single SAR phase image look like random white noise before forming an interferogram?',
+              options: [
+                'Because each resolution cell contains many scatterers contributing an unknown random scattering phase φ_scat',
+                'Because the radar receiver drops the imaginary component Q',
+                'Because thermal noise is always 100x stronger than radar echoes'
+              ],
+              answer: 0
+            }
+          }
+        ]
+      },
+      {
+        id: 'ch2',
+        number: 'Chapter 2',
+        title: 'SAR Image Statistics, Resampling & Pre-Processing',
+        subtitle: 'Speckle mechanics, discrete grid interpolation, sinc reconstruction & RGB composites',
+        lessons: [
+          {
+            id: '2.1',
+            title: 'Coherent Scattering & Speckle Filtering Mechanism',
+            status: 'have',
+            file: 'SAR speckle filtering mechancism.html',
+            demoType: 'speckle',
+            summary: 'Visualize coherent phasor interference inside a resolution cell and compare spatial/adaptive speckle filtering kernels.',
+            theory: 'Because a SAR resolution cell (e.g., 5m × 20m) is much larger than the radar wavelength (e.g., 5.6 cm), dozens of elementary scatterers inside each pixel reflect echoes with different phases. Their coherent vector sum constructive and destructive interference produces "speckle"—a multiplicative, granular salt-and-pepper pattern that follows an exponential distribution in intensity for a single look.',
+            equation: 'I_obs = I_true · n_speckle   |   ENL = μ² / σ²',
+            equationDesc: 'Multi-looking or adaptive spatial filtering (Lee, Frost, Non-Local Means) increases the Equivalent Number of Looks (ENL) at the cost of spatial resolution.',
+            mission: 'Sentinel-1 GRD products apply 5×1 (range × azimuth) multi-looking to suppress speckle before ground-range projection.',
+            exercises: [
+              'Simulate random elementary scatterer phasors inside a single pixel and observe how their vector sum fluctuates wildly.',
+              'Slide the filter window size from 3×3 to 9×9 and compare edge preservation vs. speckle variance reduction.',
+              'Compare a boxcar filter against an adaptive Lee/sigma edge-preserving filter across a sharp land-water boundary.'
+            ],
+            quiz: {
+              q: 'What is the statistical nature of speckle noise in SAR intensity imagery?',
+              options: [
+                'Multiplicative noise caused by coherent interference of sub-pixel scatterers',
+                'Additive Gaussian thermal noise from the satellite power supply',
+                'Dead pixels on the optical CCD sensor'
+              ],
+              answer: 0
+            }
+          },
+          {
+            id: '2.2',
+            title: 'Discrete Grid Resampling & Interpolation',
+            status: 'have',
+            file: 'grid_interpolator.html',
+            demoType: 'grid',
+            summary: 'Interactive comparison of Nearest Neighbor, Bilinear, and Bicubic interpolation when warping discrete 2D radar grids.',
+            theory: 'Whenever we geocode a slant-range image, align two acquisitions from slightly different orbits, or correct terrain distortions, output pixel centers fall between input grid nodes. Choosing the right interpolation kernel is critical: low-order kernels introduce high-frequency aliasing and phase distortion, whereas higher-order kernels preserve spectral fidelity.',
+            equation: 'f(x, y) = Σ_m Σ_n f[m, n] · K(x - m) · K(y - n)',
+            equationDesc: '2D separable interpolation evaluates weighted neighborhoods around the target sub-pixel coordinate (x, y).',
+            mission: 'Used in every geocoding and DEM-assisted terrain correction step across SNAP, GAMMA, and ISCE2.',
+            exercises: [
+              'Move the sub-pixel query point (x, y) inside a 4×4 pixel neighborhood to see exact distance weights.',
+              'Compare blocky Nearest-Neighbor artifacts against smooth Bicubic surface reconstruction.',
+              'Observe how interpolation attenuates high-frequency variance if the kernel is too wide.'
+            ],
+            quiz: {
+              q: 'Why is Nearest-Neighbor interpolation unsuitable for resampling Single Look Complex (SLC) images in InSAR?',
+              options: [
+                'It introduces discontinuities and severe phase aliasing that destroy interferometric coherence',
+                'It takes 1000x longer to compute than Sinc interpolation',
+                'It converts complex numbers into strings'
+              ],
+              answer: 0
+            }
+          },
+          {
+            id: '2.3',
+            title: 'Bandlimited Sinc Sub-Pixel Signal Reconstruction',
+            status: 'have',
+            file: 'Sinc Sub-Pixel Signal Reconstruction.html',
+            demoType: 'sinc',
+            summary: 'Explore the Whittaker–Shannon Nyquist sampling theorem and windowed sinc kernels for lossless complex SAR phase resampling.',
+            theory: 'Focused SAR signals are bandlimited by the chirp bandwidth in range and the Doppler bandwidth in azimuth. By the Nyquist–Shannon sampling theorem, the exact continuous complex waveform between samples can be reconstructed by convolving discrete samples with a sinc(x) = sin(πx)/(πx) kernel. In practice, a Kaiser- or Hamming-windowed 8-point or 16-point truncated sinc kernel prevents ringing while preserving InSAR phase to milliradian accuracy.',
+            equation: 'x(t) = Σ_{n=-N/2}^{N/2} x[n] · sinc((t - nT)/T) · w(t - nT)',
+            equationDesc: 'Windowed sinc interpolation is the gold standard for SLC resampling in interferometric processing.',
+            mission: 'ISCE2 and Sentinel-1 TOPS processors use 8-point to 16-point Kaiser-windowed sinc kernels (often pre-computed in a lookup table).',
+            exercises: [
+              'Shift the fractional sub-pixel offset Δx from 0.0 to 0.5 and watch the sinc lobes weight neighboring samples.',
+              'Compare a 4-point truncated sinc against a 16-point windowed sinc to observe Gibbs ringing reduction.',
+              'Test baseband vs. Doppler-centroid-shifted sinc interpolation.'
+            ],
+            quiz: {
+              q: 'Why do SAR processors multiply the ideal sinc(x) kernel by a smooth window function (like Kaiser or Hamming)?',
+              options: [
+                'Because an ideal sinc extends infinitely, and sharp truncation causes Gibbs ringing sidelobes',
+                'To convert the image from slant range to UTM coordinates',
+                'To remove atmospheric water vapor'
+              ],
+              answer: 0
+            }
+          },
+          {
+            id: '2.4',
+            title: 'Radiometric Calibration & Terrain Flattening (RTC)',
+            status: 'missing',
+            file: 'radiometric_calibration_rtc.html',
+            demoType: 'geometry',
+            summary: 'Converting raw digital numbers into physical radar backscatter (β⁰, σ⁰, γ⁰) and removing hillside brightness slopes.',
+            theory: 'Raw SAR amplitude depends on sensor gain, range spreading loss, and the illuminated surface area. Calibration converts raw pixel values to Beta-Nought (β⁰, reflectivity per unit area in slant range), Sigma-Nought (σ⁰, projected onto the smooth Earth ellipsoid), or terrain-flattened Gamma-Nought (γ⁰_RTC, normalized by true DEM-derived local illuminated area perpendicular to the look direction).',
+            equation: 'σ⁰ = β⁰ · sin(θ_loc)   |   γ⁰ = σ⁰ / cos(θ_loc)',
+            equationDesc: 'Radiometric Terrain Correction (RTC) integrates exact DEM facets so mountain slopes facing the sensor do not appear artificially bright.',
+            mission: 'OPERA and Copernicus Global Sentinel-1 Backscatter datasets distribute Analysis-Ready Data (ARD) as terrain-flattened γ⁰.',
+            exercises: [
+              'Toggle between β⁰, ellipsoid σ⁰, and DEM-flattened γ⁰ over a simulated mountain ridge.',
+              'Observe how foreshortened slopes brighten dramatically in σ⁰ but flatten cleanly in γ⁰_RTC.',
+              'Export calibrated dB histograms (10·log10(γ⁰)) for land-cover classification.'
+            ],
+            quiz: {
+              q: 'Which backscatter convention is preferred for machine-learning land-cover mapping over hilly terrain?',
+              options: [
+                'Terrain-flattened Gamma-Nought (γ⁰_RTC)',
+                'Uncalibrated raw Digital Numbers (DN)',
+                'Slant-range Beta-Nought (β⁰)'
+              ],
+              answer: 0
+            }
+          },
+          {
+            id: '2.5',
+            title: 'Multi-Temporal SAR Backscatter RGB Pipeline',
+            status: 'have',
+            file: 'SAR_multiptemporal_RGB_pipeline.html',
+            demoType: 'rgb',
+            summary: 'Map multi-date or dual-pol SAR acquisitions into Red, Green, and Blue color channels to highlight floods, crops, and urban change.',
+            theory: 'A single-polarization SAR image is grayscale, making visual interpretation of temporal change challenging. By assigning Date 1 (pre-event) to Red, Date 2 (co-event) to Green, and Date 3 or the ratio/difference to Blue, invariant scatterers (urban buildings, bare rock) appear neutral gray/white, while sudden changes—such as specular flood inundation (drop in backscatter) or crop growth—pop out in vivid primary or secondary colors.',
+            equation: '[R, G, B] = Stretch( [σ⁰(t₁)_dB,  σ⁰(t₂)_dB,  σ⁰(t₁)_dB - σ⁰(t₂)_dB] )',
+            equationDesc: 'Decibel conversion and 2%–98% histogram clipping convert skewed radar intensities into balanced 8-bit RGB composites.',
+            mission: 'Widely used by UN-SPIDER and Copernicus EMS for rapid Sentinel-1 flood mapping and agricultural monitoring.',
+            exercises: [
+              'Assign pre-flood and post-flood backscatter layers to R, G, and B channels and identify inundated floodplains in cyan/red.',
+              'Adjust the dB clipping bounds (-25 dB to 0 dB) to enhance contrast over water vs. forest.',
+              'Test VV + VH + VV/VH false-color pseudo-polarimetric composites.'
+            ],
+            quiz: {
+              q: 'In a multi-temporal RGB composite where Red = Pre-Flood σ⁰ and Green = Blue = Post-Flood σ⁰, what color do newly flooded fields appear?',
+              options: [
+                'Bright Red (high backscatter before flood, very low specular backscatter during flood)',
+                'Pure White (unchanged high backscatter)',
+                'Bright Green'
+              ],
+              answer: 0
+            }
+          }
+        ]
+      },
+      {
+        id: 'ch3',
+        number: 'Chapter 3',
+        title: 'SAR Image Co-Registration & Sentinel-1 TOPS',
+        subtitle: 'Sub-pixel alignment, cross-correlation peaks, TOPSAR azimuth steering & Enhanced Spectral Diversity',
+        lessons: [
+          {
+            id: '3.1',
+            title: 'End-to-End SAR Co-Registration Pipeline',
+            status: 'have',
+            file: 'SAR Coregistration Pipeline.html',
+            demoType: 'pipeline',
+            summary: 'Interactive architectural walkthrough of orbital coarse alignment, DEM-assisted geometrical warping, and fine sub-pixel resampling.',
+            theory: 'Before forming an interferogram or multi-temporal stack, the Secondary (slave) SLC must be aligned to the exact slant-range/azimuth pixel grid of the Reference (master) SLC to within 1/10th of a pixel (and 1/1000th of a pixel for Sentinel-1 TOPS). The pipeline proceeds from precise orbit state vectors + DEM geometry → patch cross-correlation → polynomial/mesh warp estimation → bandlimited complex sinc resampling.',
+            equation: '(r_sec, a_sec) = T_orbit_DEM(r_ref, a_ref, h_DEM) + (Δr_fine, Δa_fine)',
+            equationDesc: 'Combining orbital geometry with a Digital Elevation Model removes topography-induced range offsets prior to signal correlation.',
+            mission: 'Standard workflow in ISCE2, SNAP, and GAMMA for Sentinel-1, ALOS-2, and NISAR.',
+            exercises: [
+              'Step through each stage of the pipeline from raw orbital offsets to final phase-preserved SLC resampling.',
+              'Compare pure polynomial warping (flat Earth) against DEM-assisted geometrical co-registration over rough terrain.',
+              'Inspect how misregistration > 0.2 pixels rapidly degrades interferometric coherence.'
+            ],
+            quiz: {
+              q: 'Why is a Digital Elevation Model (DEM) used during geometric SAR co-registration?',
+              options: [
+                'Because parallax from different orbital baselines shifts elevated terrain by different slant-range offsets than flat valleys',
+                'To colorize the SAR image with green vegetation',
+                'To replace the radar phase with optical imagery'
+              ],
+              answer: 0
+            }
+          },
+          {
+            id: '3.2',
+            title: 'SAR Image Co-Registration Cross-Correlation Peak',
+            status: 'have',
+            file: 'SAR Image Co-Registration Peak.html',
+            demoType: 'peak',
+            summary: 'Explore 2D normalized cross-correlation surfaces, oversampled peak fitting, and SNR thresholding between reference and secondary chips.',
+            theory: 'To measure fine sub-pixel shifts (Δr, Δa) empirically from the image data, processors extract hundreds of small image chips (e.g., 64×64 pixels) across the scene and compute their 2D Normalized Cross-Correlation (NCC) via Fast Fourier Transforms. By oversampling the complex or amplitude correlation surface around its maximum (or fitting a 2D paraboloid), offsets are estimated to ~0.02–0.05 pixel precision.',
+            equation: 'C(Δr, Δa) = | IFFT( FFT(|M|) · conj(FFT(|S|)) ) |',
+            equationDesc: 'Sharp, high-SNR correlation peaks occur over high-contrast features or coherent speckle, while water bodies yield flat, noisy surfaces.',
+            mission: 'Used in AMPACOR / dense offset tracking (also used to measure glacier velocity and large earthquake ruptures).',
+            exercises: [
+              'Adjust chip size and oversampling factor to see how the 2D cross-correlation peak sharpens.',
+              'Add decorrelation noise and observe when peak SNR falls below the rejection threshold.',
+              'Compare complex coherent cross-correlation vs. incoherent amplitude cross-correlation.'
+            ],
+            quiz: {
+              q: 'How do SAR processors locate the cross-correlation peak with sub-pixel precision (e.g., 0.05 pixels)?',
+              options: [
+                'By oversampling the correlation peak in the frequency domain or fitting a 2D parabolic surface around the peak',
+                'By rounding all offsets to the nearest integer pixel',
+                'By deleting every second row of the image'
+              ],
+              answer: 0
+            }
+          },
+          {
+            id: '3.3',
+            title: 'SAR Image Grid Spatial Alignment & Resampling',
+            status: 'have',
+            file: 'SAR Image Grid Spatial Alignment and Resampling.html',
+            demoType: 'grid',
+            summary: 'Visualize how 2D displacement fields (translation, rotation, scale, and topographic warp) map secondary grid coordinates onto the reference grid.',
+            theory: 'Once tie-point offsets or DEM-assisted geometric transformations define the continuous mapping between the Reference grid and Secondary grid, backward mapping (pull resampling) iterates over every integer pixel (r, a) of the Reference grid, projects it into fractional coordinates (r\', a\') inside the Secondary image, and evaluates the complex interpolation kernel there.',
+            equation: 'S_aligned[r, a] = Interpolate( S_raw,  r + Δr(r, a),  a + Δa(r, a) ) · exp(-j·φ_deramp)',
+            equationDesc: 'Backward (pull) mapping guarantees every output pixel on the reference grid is populated without holes or overlaps.',
+            mission: 'Fundamental to all SAR stack processors.',
+            exercises: [
+              'Apply affine rotation, range scaling, and topographic shear to the secondary grid and inspect backward-mapped sample locations.',
+              'Toggle phase deramping before interpolation to see why high Doppler centroids must be shifted to baseband prior to resampling.',
+              'Inspect residual grid alignment vectors across the swath.'
+            ],
+            quiz: {
+              q: 'Why do image warping algorithms use backward mapping (iterating over output reference pixels) rather than forward mapping?',
+              options: [
+                'Backward mapping guarantees every output pixel receives a value with no unpopulated gaps or collisions',
+                'Forward mapping only works on optical images',
+                'Backward mapping does not require any interpolation'
+              ],
+              answer: 0
+            }
+          },
+          {
+            id: '3.4',
+            title: 'Joint InSAR Stack Image Co-Registration',
+            status: 'have',
+            file: 'Joint InSAR Image Co-Registration.html',
+            demoType: 'network',
+            summary: 'Network-based multi-image co-registration ensuring phase closure and geometric consistency across long multi-year SAR time series.',
+            theory: 'When co-registering a stack of 100+ SAR acquisitions over several years, aligning every old or winter image directly to a single reference date often fails due to temporal decorrelation. Joint stack co-registration builds a redundant network of short-temporal-baseline pairs, estimates pairwise offsets (Δr_ij, Δa_ij), and solves a weighted least-squares inversion to tie every acquisition consistently to the global reference grid.',
+            equation: 'A · x_offsets = b_pairwise   ⇒   x̂ = (Aᵀ W A)⁻¹ Aᵀ W b',
+            equationDesc: 'Network inversion suppresses pairwise registration errors by enforcing zero misregistration closure around closed loops (Δ_12 + Δ_23 + Δ_31 = 0).',
+            mission: 'Core architecture of Sentinel-1 stack processors (isce2 topsStack, dolphin, MintPy) and NISAR time-series pipelines.',
+            exercises: [
+              'Add and remove edges in the acquisition baseline network and observe how least-squares inversion stabilizes noisy pairs.',
+              'Inject an outlier offset on a low-coherence pair and see how loop-closure weighting rejects it.',
+              'Compare star-network (single master) vs. sequential/delaunay network registration.'
+            ],
+            quiz: {
+              q: 'What is the main advantage of joint network co-registration over simple star-graph (single master) co-registration for long time series?',
+              options: [
+                'It maintains high correlation by linking temporally adjacent acquisitions and averages out random errors via network inversion',
+                'It avoids having to download orbit files',
+                'It reduces the number of pixels in each image by 90%'
+              ],
+              answer: 0
+            }
+          },
+          {
+            id: '3.5',
+            title: 'Sentinel-1 TOPS Co-Registration & Azimuth Beam Steering',
+            status: 'have',
+            file: 'Sentinel-1 TOPS Coregistration.html',
+            demoType: 'tops',
+            summary: 'Understand Terrain Observation with Progressive Scans (TOPSAR) azimuth steering and why 0.001-pixel accuracy is mandatory.',
+            theory: 'Sentinel-1 Interferometric Wide (IW) mode uses TOPSAR: within each burst, the antenna beam sweeps electronically backward-to-forward in azimuth to cover a 250 km swath without scalloping. Because the azimuth sweep imparts a steep linear Doppler centroid ramp (≈ 5,500 Hz/sec) across each burst, even a tiny azimuth misregistration Δt produces a phase offset Δφ = 2π · f_DC(t) · Δt that jumps sharply across burst boundaries!',
+            equation: 'Δφ_az = 2π · f_DC(η) · Δη   ⇒   |Δη| < 0.001 pixels (≈ 1.4 cm)',
+            equationDesc: 'To keep phase jumps between adjacent TOPS bursts below 1.5°, azimuth co-registration must be accurate to better than 1/1000th of a pixel.',
+            mission: 'Sentinel-1A/B/C IW mode (3 sub-swaths, ~1.5 km burst overlap zones).',
+            exercises: [
+              'Simulate TOPSAR backward-to-forward azimuth beam steering and plot the Doppler frequency ramp across bursts.',
+              'Introduce a 0.02-pixel azimuth misregistration and observe the severe sawtooth phase jumps at burst boundaries.',
+              'Apply azimuth phase deramping and reramping to properly interpolate TOPS bursts.'
+            ],
+            quiz: {
+              q: 'What artifact appears in a Sentinel-1 TOPS interferogram if azimuth co-registration is only accurate to 0.05 pixels instead of 0.001 pixels?',
+              options: [
+                'Sharp horizontal phase discontinuities (jumps) at the boundaries between consecutive bursts',
+                'Total loss of the Red channel',
+                'Inversion of East and West coordinates'
+              ],
+              answer: 0
+            }
+          },
+          {
+            id: '3.6',
+            title: 'InSAR Spectral Diversity & Sentinel-1 Enhanced Spectral Diversity (ESD)',
+            status: 'have',
+            file: 'InSAR Spectral Diversity.html',
+            secondaryFile: 'Sentinel-1 Enhanced Spectral Diversity.html',
+            demoType: 'tops',
+            summary: 'Dual interactive lab covering Spectral Diversity and Sentinel-1 Enhanced Spectral Diversity (ESD) in burst overlap zones.',
+            theory: 'Standard cross-correlation only reaches ~0.05 pixel accuracy. Spectral Diversity exploits the difference in Doppler centroid Δf_DC between two sub-looks (or between the forward edge of Burst N and backward edge of Burst N+1 in TOPS overlap zones). Forming a double-difference interferogram in the ~1.5 km burst overlap strips isolates pure azimuth misregistration with millipixel precision!',
+            equation: 'Δφ_ESD = arg( (I_ref,fwd · I*_sec,fwd) · (I_ref,bwd · I*_sec,bwd)* ) = 2π · Δf_ovl · Δη',
+            equationDesc: 'With a ~4,800 Hz Doppler separation in Sentinel-1 burst overlaps, ESD easily resolves azimuth shifts smaller than 0.001 pixels.',
+            mission: 'Includes both `InSAR Spectral Diversity.html` and `Sentinel-1 Enhanced Spectral Diversity.html`.',
+            exercises: [
+              'Toggle between your two HTML simulations (`InSAR Spectral Diversity.html` and `Sentinel-1 Enhanced Spectral Diversity.html`) using the selector below.',
+              'Adjust the burst overlap Doppler separation Δf_ovl and observe the sensitivity of Δφ_ESD to sub-millipixel shifts.',
+              'Verify that topographic and deformation phases cancel out in the double-difference overlap product.'
+            ],
+            quiz: {
+              q: 'Why do topographic and ground deformation phases cancel out in Enhanced Spectral Diversity (ESD)?',
+              options: [
+                'Because ESD computes the phase difference between two overlapping bursts acquired milliseconds apart along the exact same line-of-sight',
+                'Because ESD is only computed over flat ocean water',
+                'Because ESD deletes the imaginary part of the SLC'
+              ],
+              answer: 0
+            }
+          }
+        ]
+      },
+      {
+        id: 'ch4',
+        number: 'Chapter 4',
+        title: 'SAR Interferometry (InSAR) Fundamentals',
+        subtitle: 'Path-length phase shifts, perpendicular baselines, coherence & topographic removal',
+        lessons: [
+          {
+            id: '4.1',
+            title: 'InSAR Radar Path Length & Phase Shift',
+            status: 'have',
+            file: 'InSAR Radar Path Length and Phase Shift.html',
+            demoType: 'phase',
+            summary: 'See how two-way slant-range path differences (Δr) map to wrapped interferometric phase (Δφ = 4π/λ · Δr) while cancelling random scattering phase.',
+            theory: 'While the phase of a single SAR image looks random because of unknown sub-pixel scatterer arrangements (φ_scat), multiplying Reference pixel z₁ by the complex conjugate of co-registered Secondary pixel z₂* subtracts their phases: Δφ = φ₁ - φ₂. Provided the sub-pixel scatterers do not rearrange between passes, φ_scat cancels out completely, leaving a pure measurement of the two-way path difference Δr accurate to a fraction of the radar wavelength λ!',
+            equation: 'I_ifgm = z₁ · z₂* = |z₁||z₂| exp(j(φ₁ - φ₂))   ⇒   Δφ = -(4π / λ) · Δr  (mod 2π)',
+            equationDesc: 'Because the radar wave travels to the ground and back (2 · Δr), one full 2π fringe cycle equals λ/2 of line-of-sight range change.',
+            mission: 'One fringe cycle (2π rad) equals 2.8 cm in Sentinel-1 (C-band, λ=5.6 cm) and 11.8 cm in NISAR/ALOS-2 (L-band, λ=23.6 cm).',
+            exercises: [
+              'Vary the slant-range path difference Δr by a few centimeters and watch the interferometric phasor complete full 2π cycles.',
+              'Switch radar wavelength between X-band (3.1 cm), C-band (5.6 cm), and L-band (23.6 cm) to compare fringe density.',
+              'Verify how identical φ_scat terms cancel when multiplying z₁ · z₂*.'
+            ],
+            quiz: {
+              q: 'For a C-band radar with wavelength λ = 5.6 cm, how much line-of-sight displacement corresponds to one full interferometric fringe (2π radians)?',
+              options: [
+                '2.8 cm (half of the wavelength due to the two-way round trip)',
+                '5.6 cm (one full wavelength)',
+                '11.2 cm (twice the wavelength)'
+              ],
+              answer: 0
+            }
+          },
+          {
+            id: '4.2',
+            title: 'InSAR Topographic Acquisition & Fringes',
+            status: 'have',
+            file: 'InSAR Topographic Acquisition and Fringes.html',
+            demoType: 'fringes',
+            summary: 'Explore how perpendicular orbital baseline (B⊥) and terrain elevation generate contour-like topographic interferometric fringes.',
+            theory: 'When two SAR acquisitions observe the same mountain from slightly separated orbital tracks, the distance separating the satellites perpendicular to the look direction is the perpendicular baseline (B⊥). This stereo parallax causes the phase difference Δφ_topo to vary linearly with terrain height h. The height change that generates one 2π fringe cycle is the Altitude of Ambiguity (h_a).',
+            equation: 'Δφ_topo = -(4π · B_⊥) / (λ · R · sin θ) · h   |   h_a = (λ · R · sin θ) / (2 · B_⊥)',
+            equationDesc: 'Larger perpendicular baselines B_⊥ increase sensitivity to topography (smaller h_a), while B_⊥ = 0 eliminates topographic sensitivity.',
+            mission: 'SRTM and TanDEM-X use baselines of 60 m – 300 m to build global DEMs; Sentinel-1 keeps B_⊥ < 150 m to favor deformation monitoring.',
+            exercises: [
+              'Increase perpendicular baseline B⊥ from 20 m to 250 m and observe topographic fringes tighten around the synthetic mountain.',
+              'Calculate the Altitude of Ambiguity h_a and verify how many meters of elevation each fringe represents.',
+              'Increase B⊥ toward the critical baseline B_crit where spectral shift causes total geometric decorrelation.'
+            ],
+            quiz: {
+              q: 'If you double the perpendicular baseline B⊥ between two SAR orbits, what happens to the Altitude of Ambiguity (h_a)?',
+              options: [
+                'It is cut in half (topographic fringes become twice as dense)',
+                'It doubles (fewer fringes per mountain)',
+                'It becomes zero'
+              ],
+              answer: 0
+            }
+          },
+          {
+            id: '4.3',
+            title: 'InSAR Spatial Phase Coherence & Decorrelation',
+            status: 'have',
+            file: 'InSAR Spatial Phase Coherence.html',
+            demoType: 'coherence',
+            summary: 'Interactive coherence estimator exploring complex correlation magnitude |γ|, multi-look window size, and temporal/geometric decorrelation.',
+            theory: 'Interferometric coherence γ (ranging from 0 to 1) measures the local phase stability between two SAR images inside an estimation window. Total coherence is the product of thermal SNR coherence, geometric baseline coherence, volume scattering coherence (forest canopies), and temporal coherence (surface changes from vegetation growth, snow, plowing, or water).',
+            equation: 'γ̂ = | Σ (z₁ · z₂*) | / √( Σ|z₁|² · Σ|z₂|² )   |   γ_total = γ_SNR · γ_geom · γ_vol · γ_temp',
+            equationDesc: 'High coherence (γ > 0.6) yields clean, low-variance phase fringes; low coherence (γ < 0.2) produces pure phase noise.',
+            mission: 'Coherence maps themselves are widely used in Earth Observation to map urban damage after earthquakes or forest biomass.',
+            exercises: [
+              'Adjust the coherence level γ from 0.1 to 0.95 and inspect the probability density function of phase noise σ_φ.',
+              'Change the spatial estimation window size (e.g., 3×3 vs. 11×11) to observe estimation bias at low coherence.',
+              'Compare C-band vs. L-band coherence retention over vegetated terrain.'
+            ],
+            quiz: {
+              q: 'Why do open water bodies (oceans and lakes) almost always exhibit near-zero interferometric coherence (γ ≈ 0) in repeat-pass InSAR?',
+              options: [
+                'Because the water surface moves and reshapes completely within milliseconds, causing total temporal decorrelation',
+                'Because radar waves cannot travel over water',
+                'Because lakes have infinite altitude of ambiguity'
+              ],
+              answer: 0
+            }
+          },
+          {
+            id: '4.4',
+            title: 'InSAR Topographic Phase Subtraction (DEM Removal)',
+            status: 'have',
+            file: 'InSAR Topographic Phase Subtraction.html',
+            demoType: 'fringes',
+            summary: 'Simulate synthetic topographic phase from an external DEM and subtract it from the raw interferogram to isolate ground deformation.',
+            theory: 'A raw repeat-pass interferogram contains a mixture of flat-Earth orbital fringes, topographic fringes, surface deformation, and atmospheric delay. In 2-pass Differential InSAR (DInSAR), we use an external Digital Elevation Model (such as SRTM or Copernicus DEM) together with precise orbital state vectors to simulate the exact topographic phase φ_sim_topo and subtract it via complex conjugate multiplication.',
+            equation: 'φ_diff = arg( I_raw · exp(-j · φ_DEM_sim) ) = φ_def + (4π · B_⊥ / (λ R sin θ)) · Δh_err + φ_atm',
+            equationDesc: 'After subtracting simulated DEM phase, any residual DEM height error Δh_err scales proportionally to perpendicular baseline B_⊥.',
+            mission: 'Standard 2-pass DInSAR workflow for co-seismic earthquake fault modeling and volcano monitoring.',
+            exercises: [
+              'Generate a raw interferogram containing both a mountain (topography) and a subsiding basin (deformation).',
+              'Toggle DEM phase subtraction to strip away the mountain contours and reveal the isolated deformation bullseye.',
+              'Introduce a 10 m DEM error and observe how small baselines (B⊥ < 50 m) minimize residual topographic artifacts.'
+            ],
+            quiz: {
+              q: 'Why do deformation-focused missions like Sentinel-1 maintain a tight orbital tube (small perpendicular baseline B⊥)?',
+              options: [
+                'To minimize sensitivity to DEM height errors and preserve geometric coherence when isolating ground deformation',
+                'To maximize topographic errors',
+                'To turn off the Doppler effect'
+              ],
+              answer: 0
+            }
+          },
+          {
+            id: '4.5',
+            title: '2D Phase Unwrapping & Modulo-2π Ambiguity',
+            status: 'missing',
+            file: 'insar_phase_unwrapping.html',
+            demoType: 'fringes',
+            summary: 'Resolving wrapped [-π, π) interferometric fringes into continuous physical displacement using branch cuts and minimum-cost flow.',
+            theory: 'Because complex phase is only observable modulo 2π (wrapped into [-π, π)), an interferogram shows repeating rainbow cycles rather than absolute displacement. Phase unwrapping integrates phase gradients across the 2D grid by adding integer multiples of 2π (2kπ) wherever jumps exceed π. However, phase noise and steep gradients create non-conservative rotational curl points called "residues" (+1 / -1 charges) that must be connected by branch cuts so unwrapping errors do not propagate globally.',
+            equation: 'Φ_unwrapped(x, y) = φ_wrapped(x, y) + 2π · k(x, y),   k ∈ ℤ',
+            equationDesc: 'Closed-loop line integrals around a 2×2 pixel loop must sum to zero unless a positive or negative phase residue is present.',
+            mission: 'Implemented via SNAPHU (Statistical-Cost, Network-Flow Algorithm for Phase Unwrapping) in nearly all InSAR pipelines.',
+            exercises: [
+              'Integrate wrapped fringes across a 2D displacement bowl to reconstruct continuous centimeter motion.',
+              'Add decorrelation noise to spawn positive/negative phase residues and place branch-cut barriers between them.',
+              'Observe how integrating across an unbridged residue creates a 2π tear across the unwrapped map.'
+            ],
+            quiz: {
+              q: 'What is a "phase residue" in 2D interferometric phase unwrapping?',
+              options: [
+                'A local 2×2 pixel loop where the sum of wrapped phase differences is ±2π instead of 0, causing path-dependent unwrapping errors',
+                'Leftover disk space after deleting SLC files',
+                'A calibration target placed on the ground'
+              ],
+              answer: 0
+            }
+          }
+        ]
+      },
+      {
+        id: 'ch5',
+        number: 'Chapter 5',
+        title: 'Differential InSAR (DInSAR) & Time-Series InSAR',
+        subtitle: '3-pass DInSAR, 3D LOS vector decomposition, atmospheric screens & Phase Linking',
+        lessons: [
+          {
+            id: '5.1',
+            title: '3-Pass Differential InSAR',
+            status: 'have',
+            file: '3-Pass Differential InSAR.html',
+            demoType: 'fringes',
+            summary: 'Combine a topographic interferometric pair and a deformation pair to cancel topography without relying on an external DEM.',
+            theory: 'When an accurate external DEM is unavailable or rapidly changing (e.g., over active lava domes, glaciers, or open-pit mines), 3-Pass DInSAR uses three SAR acquisitions (t₁, t₂, t₃). Pair (t₁, t₂) spans a short time interval with zero deformation to capture pure topography; Pair (t₁, t₃) spans the deformation event. By scaling the unwrapped topographic phase by the ratio of their perpendicular baselines (B⊥,13 / B⊥,12) and subtracting it, topography cancels out directly from the radar observations.',
+            equation: 'φ_def = φ₁₃ - (B_⊥,13 / B_⊥,12) · Φ_unwrapped,12',
+            equationDesc: 'Requires unwrapping the topographic pair first so the baseline ratio scaling factor can be applied continuously.',
+            mission: 'Pioneered with ERS-1/2 tandem pairs and still used over rapidly evolving volcanic domes and ice sheets.',
+            exercises: [
+              'Adjust the perpendicular baselines B⊥,12 and B⊥,13 of the three satellite passes.',
+              'Scale the topographic interferogram by the baseline ratio and subtract it from the co-seismic interferogram.',
+              'Compare noise amplification when B⊥,12 is much smaller than B⊥,13.'
+            ],
+            quiz: {
+              q: 'Why must the topographic pair typically be phase-unwrapped before scaling in 3-Pass Differential InSAR?',
+              options: [
+                'Because multiplying a wrapped phase by a non-integer baseline ratio (B⊥,13 / B⊥,12) scrambles the 2π modulo jumps',
+                'Because unwrapped phases require less memory',
+                'Because 3-Pass DInSAR only works on amplitude images'
+              ],
+              answer: 0
+            }
+          },
+          {
+            id: '5.2',
+            title: 'InSAR Phase-to-Displacement Vector Calculator',
+            status: 'have',
+            file: 'InSAR Phase-to-Displacement Vector Calculator.html',
+            demoType: 'vector',
+            summary: 'Interactive 3D geometry solver combining Ascending and Descending Line-of-Sight (LOS) measurements to resolve Vertical and East-West ground motion.',
+            theory: 'A single interferogram only measures the 1D projection of true 3D surface displacement [d_East, d_North, d_Up] onto the radar Line-of-Sight (LOS) unit vector. Consequently, uplift and westward motion look identical in a descending right-looking pass! By combining Ascending (flying North, looking East) and Descending (flying South, looking West) acquisitions over the same area, we can decompose LOS measurements into Vertical (d_Up) and Horizontal East-West (d_East) displacement components.',
+            equation: 'd_LOS = d_U · cos(θ) - d_E · sin(θ)cos(α_h) + d_N · sin(θ)sin(α_h)',
+            equationDesc: 'Because polar-orbiting satellites fly nearly North-South (heading α_h ≈ -10° or -170°), InSAR is highly sensitive to Vertical and East-West motion, and weakly sensitive to North-South motion.',
+            mission: 'Essential for separating vertical groundwater subsidence from horizontal tectonic fault slip using Sentinel-1 Ascending + Descending tracks.',
+            exercises: [
+              'Set a true 3D ground displacement vector (d_E, d_N, d_U) and inspect its projection onto Ascending and Descending LOS vectors.',
+              'Invert the 2×2 system from Ascending + Descending LOS displacements to recover Vertical and East-West motion.',
+              'Verify why North-South motion has minimal sensitivity in standard stripmap/TOPS LOS phase.'
+            ],
+            quiz: {
+              q: 'Why is repeat-pass InSAR least sensitive to pure North-South horizontal ground displacement?',
+              options: [
+                'Because SAR satellites fly in near-polar (North-South) orbits and look perpendicular (East or West) to their flight path',
+                'Because the Earth magnetic field blocks North-South radar waves',
+                'Because wavelengths are shorter in the North-South direction'
+              ],
+              answer: 0
+            }
+          },
+          {
+            id: '5.3',
+            title: 'Atmospheric Phase Screen (APS) & Tropospheric Delays',
+            status: 'missing',
+            file: 'insar_atmospheric_delay.html',
+            demoType: 'fringes',
+            summary: 'Distinguishing topography-correlated tropospheric water vapor delays and turbulent clouds from real tectonic or volcanic deformation.',
+            theory: 'Radar waves slow down slightly when passing through the neutral atmosphere (especially wet tropospheric water vapor) and speed up in the ionosphere. Because water vapor is often stratified with altitude, a change in weather between two satellite passes creates topography-correlated phase fringes around mountains and volcanoes that closely mimic volcanic inflation or deflation! Separating APS from deformation requires stacking multiple dates or weather-model corrections (ERA5, GACOS).',
+            equation: 'φ_obs(t_i, t_j) = φ_def(t_i, t_j) + (φ_APS(t_j) - φ_APS(t_i)) + φ_noise',
+            equationDesc: 'Atmospheric delay is correlated in space but uncorrelated in time, whereas tectonic deformation is correlated in both space and time.',
+            mission: 'Major error source in C-band (Sentinel-1) and L-band (NISAR, which also corrects ionospheric dispersive delays via split-spectrum).',
+            exercises: [
+              'Simulate stratified tropospheric delay over a volcano and compare it against a Mogi magma inflation source.',
+              'Stack 10 interferograms to see random turbulent atmospheric clouds average down while steady deformation accumulates.',
+              'Apply a linear phase-vs-elevation regression to estimate stratified tropospheric delay.'
+            ],
+            quiz: {
+              q: 'How do time-series InSAR algorithms separate atmospheric phase delay from steady ground deformation?',
+              options: [
+                'Atmosphere is spatially correlated but temporally random from pass to pass, whereas deformation evolves systematically over time',
+                'Atmospheric delay only occurs over oceans',
+                'Atmosphere only affects the amplitude, never the phase'
+              ],
+              answer: 0
+            }
+          },
+          {
+            id: '5.4',
+            title: 'Phase Linking InSAR Denoising (Multi-Temporal DS-InSAR)',
+            status: 'have',
+            file: 'Phase Linking InSAR Denoising.html',
+            demoType: 'network',
+            summary: 'Explore Complex Sample Covariance Matrix (SCM) estimation and Maximum Likelihood Phase Linking over Distributed Scatterers (DS).',
+            theory: 'Traditional Persistent Scatterer (PS) InSAR works only on bright, stable point targets (buildings, boulders) and leaves rural/vegetated areas blank. Distributed Scatterer (DS) algorithms (SqueeSAR, Phase Linking, MiNoPy, Dolphin) group statistically homogeneous neighboring pixels to estimate the N×N Complex Sample Covariance Matrix C across all N acquisitions. Phase Linking exploits all N(N-1)/2 interferometric pairs simultaneously via eigenvalue decomposition or MLE to recover an optimal, denoised N-1 phase series!',
+            equation: 'θ̂ = arg max_θ ( θᴴ · ( |Γ|⁻¹ ∘ Γ ) · θ )',
+            equationDesc: 'Phase Linking compresses noisy all-pairs interferograms into a single consistent, phase-triangularity-closed time series.',
+            mission: 'Powers modern global surface displacement products (OPERA DISP-S1, European Ground Motion Service).',
+            exercises: [
+              'Inspect the N×N complex coherence matrix Γ across short-baseline and long-baseline pairs.',
+              'Run the iterative Phase Linking / EMI solver and compare raw noisy wrapped interferograms against the reconstructed linked phase.',
+              'Evaluate Posterior Phase Coherence (temporal coherence γ_PTA) to mask unreliable pixels.'
+            ],
+            quiz: {
+              q: 'What information does Phase Linking use that standard single-pair InSAR ignores?',
+              options: [
+                'The full N×N complex covariance matrix containing all possible N(N-1)/2 interferometric combinations across the time series',
+                'Optical cloud cover percentages',
+                'Only the very first and very last image in the stack'
+              ],
+              answer: 0
+            }
+          }
+        ]
+      },
+      {
+        id: 'ch6',
+        number: 'Chapter 6',
+        title: 'Polarimetric SAR (PolSAR) & EO Applications',
+        subtitle: 'Wavelength penetration, scattering mechanisms, H/A/α decompositions & real-world EO case studies',
+        lessons: [
+          {
+            id: '6.1',
+            title: 'Radar Wavelength Penetration & Polarimetric Scattering Mechanisms',
+            status: 'missing',
+            file: 'sar_wavelength_polarimetry.html',
+            demoType: 'rgb',
+            summary: 'Interactive comparison of X, C, L, and P-band canopy penetration alongside Surface ( Bragg), Double-Bounce (Dihedral), and Volume scattering.',
+            theory: 'Radar waves interact with structures comparable in size to their wavelength λ. Short X-band (3 cm) and C-band (5.6 cm) waves scatter off top leaves and twigs, whereas longer L-band (24 cm) and P-band (70 cm) waves penetrate through forest canopies to hit tree trunks and the ground. Simultaneously, transmitting and receiving Horizontal (H) and Vertical (V) polarizations separates Single-Bounce rough surfaces (strong HH & VV), Double-Bounce urban/flooded-forest dihedrals (strong HH > VV with 180° phase shift), and random Volume canopies (strong cross-pol HV).',
+            equation: 'S = [ S_HH   S_HV ;  S_VH   S_VV ]   |   k_Pauli = (1/√2) [ S_HH+S_VV,  S_HH-S_VV,  2·S_HV ]ᵀ',
+            equationDesc: 'Pauli RGB decomposition assigns |S_HH - S_VV| (Double-Bounce) to Red, 2|S_HV| (Volume) to Green, and |S_HH + S_VV| (Surface) to Blue.',
+            mission: 'NISAR (L + S band), ALOS-4 (L-band quad-pol), BIOMASS (P-band), and Radarsat Constellation Mission.',
+            exercises: [
+              'Switch radar band from X → C → L → P over a tropical forest canopy and watch scattering shift from crown leaves to trunk-ground double bounce.',
+              'Adjust soil moisture and surface roughness to see co-polarized backscatter increase.',
+              'Compare Pauli RGB vs. Lexicographic RGB color assignments.'
+            ],
+            quiz: {
+              q: 'Which polarimetric channel is most sensitive to depolarized volume scattering from dense forest canopies?',
+              options: [
+                'Cross-polarization (HV or VH)',
+                'Pure HH over smooth water',
+                'Zero-baseline interferometric phase'
+              ],
+              answer: 0
+            }
+          },
+          {
+            id: '6.2',
+            title: 'Polarimetric Decompositions (Cloude–Pottier H / A / α Explorer)',
+            status: 'missing',
+            file: 'polsar_ha_alpha_plane.html',
+            demoType: 'coherence',
+            summary: 'Explore the 3×3 Polarimetric Coherency Matrix [T₃] and classify scatterers on the interactive Entropy (H) – Alpha (α) plane.',
+            theory: 'For natural distributed targets, the 3×3 spatially averaged Polarimetric Coherency Matrix ⟨[T₃]⟩ can be decomposed into three orthogonal eigenvectors (Cloude–Pottier decomposition). Polarimetric Entropy H (0 to 1) measures the randomness of scattering (0 = single pure mechanism, 1 = depolarized noise), Anisotropy A measures the relative importance of the second vs. third mechanism, and the mean Alpha angle ᾱ (0° to 90°) identifies the physical mechanism: ᾱ ≈ 0° (Surface), ᾱ ≈ 45° (Dipole/Volume), and ᾱ ≈ 90° (Dihedral Double-Bounce).',
+            equation: '⟨[T₃]⟩ = Σ_{i=1}^3 λ_i · u_i u_iᴴ   |   H = -Σ p_i log₃(p_i),   ᾱ = Σ p_i α_i',
+            equationDesc: 'Plotting H vs. ᾱ partitions pixels into 9 physical scattering zones without requiring training data.',
+            mission: 'Supported natively in ESA PolSARpro and SNAP for ALOS-2, RADARSAT-2, and NISAR quad-pol datasets.',
+            exercises: [
+              'Click across the 9 zones of the H–α classification plane to inspect the corresponding physical target structures.',
+              'Adjust eigenvalue probabilities (p₁, p₂, p₃) and watch Entropy H move from deterministic (H=0) to random volume (H>0.85).',
+              'Compare Freeman–Durden 3-component model decomposition against eigenvector H/A/α.'
+            ],
+            quiz: {
+              q: 'In the Cloude–Pottier H/A/α decomposition, what does a mean alpha angle of ᾱ ≈ 90° with low entropy (H ≈ 0.2) indicate?',
+              options: [
+                'Strong dihedral double-bounce scattering (such as urban buildings or flooded tree trunks)',
+                'Bragg surface scattering from calm water',
+                'Pure thermal receiver noise'
+              ],
+              answer: 0
+            }
+          },
+          {
+            id: '6.3',
+            title: 'Earth Observation Case Studies: Floods, Earthquakes, Glaciers & Forests',
+            status: 'missing',
+            file: 'sar_eo_case_studies.html',
+            demoType: 'vector',
+            summary: 'Capstone decision tree connecting every SAR & InSAR tool in this course to operational Earth Observation hazards and climate monitoring.',
+            theory: 'This capstone ties together all 6 chapters: (1) Flood Mapping uses calibrated γ⁰ backscatter drops and InSAR coherence loss in urban zones; (2) Tectonic Earthquakes & Volcanoes use 2-pass DInSAR, TOPS ESD co-registration, phase unwrapping, and Ascending/Descending 3D vector decomposition; (3) Urban Infrastructure & Groundwater Subsidence use Phase Linking / PS-InSAR time series; and (4) Forest Biomass & Agriculture use multi-temporal RGB composites and L-band PolSAR decompositions.',
+            equation: 'EO_Pipeline = Calibrate / Co-Register → Interferogram / PolSAR → Unwrap / Decompose → Geophysical Inversion',
+            equationDesc: 'Selecting the right SAR observable (Amplitude, Coherence, Phase, or Polarimetry) is the key to operational Earth Observation.',
+            mission: 'Synthesizes Sentinel-1, NISAR, ALOS-2/4, TerraSAR-X, and BIOMASS applications.',
+            exercises: [
+              'Select an Earth Observation hazard (Flood, Earthquake, Landslide, Deforestation) to highlight the exact chain of course modules required.',
+              'Compare why C-band InSAR excels in arid tectonic zones while L-band InSAR is essential for vegetated landslides.',
+              'Review the complete 28-lesson mastery checklist.'
+            ],
+            quiz: {
+              q: 'Why is SAR uniquely indispensable for emergency flood and cyclone disaster response compared to optical satellites (Sentinel-2 / Landsat)?',
+              options: [
+                'Active microwave radar penetrates dense cloud cover, rain, and smoke, and operates day and night independent of solar illumination',
+                'SAR images have higher color saturation than optical cameras',
+                'SAR satellites orbit only 10 km above the ground'
+              ],
+              answer: 0
+            }
+          }
+        ]
+      }
+    ];
+
+    // Flatten lessons for quick lookup
+    const ALL_LESSONS = [];
+    CHAPTERS.forEach(ch => {
+      ch.lessons.forEach(l => {
+        ALL_LESSONS.push({ ...l, chapterId: ch.id, chapterNumber: ch.number, chapterTitle: ch.title });
+      });
+    });
+
+    // State
+    let currentView = 'overview';
+    let currentLessonId = '1.2';
+    let sidebarFilter = 'all';
+    let searchQuery = '';
+    let completedLessons = {};
+    let currentSimMode = 'sandbox'; // Default to 'sandbox' so user gets instant visual interactivity in Canvas while also seeing iframe code!
+    let activeSecondaryFile = false;
+
+    try {
+      const saved = localStorage.getItem('sareo_completed_lessons');
+      if (saved) completedLessons = JSON.parse(saved);
+    } catch (e) {}
+
+    function saveProgress() {
+      try {
+        localStorage.setItem('sareo_completed_lessons', JSON.stringify(completedLessons));
+      } catch (e) {}
+      updateProgressUI();
+    }
+
+    function updateProgressUI() {
+      const count = Object.keys(completedLessons).filter(k => completedLessons[k]).length;
+      const badge = document.getElementById('progressBadge');
+      if (badge) badge.textContent = count + ' / ' + ALL_LESSONS.length;
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.remove('hidden');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => t.classList.add('hidden'), 3200);
+    }
+
+    // Navigation View Switcher
+    function switchView(viewName) {
+      currentView = viewName;
+      ['overview', 'lesson', 'gaps', 'github'].forEach(v => {
+        const el = document.getElementById('view-' + v);
+        if (el) el.classList.toggle('hidden', v !== viewName);
+      });
+      document.querySelectorAll('.nav-tab').forEach(btn => {
+        const isMatch = btn.getAttribute('data-nav') === viewName;
+        btn.className = 'nav-tab px-3.5 py-1.5 rounded-lg text-xs font-medium transition whitespace-nowrap ' +
+          (isMatch ? 'bg-cyan-500 text-slate-950 font-semibold' : 'text-slate-300 hover:text-white');
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Render Sidebar Chapters & Lessons
+    function renderSidebar() {
+      const container = document.getElementById('chapterList');
+      container.innerHTML = '';
+
+      CHAPTERS.forEach(ch => {
+        const filtered = ch.lessons.filter(l => {
+          if (sidebarFilter === 'have' && l.status !== 'have') return false;
+          if (sidebarFilter === 'missing' && l.status !== 'missing') return false;
+          if (searchQuery) {
+            const q = searchQuery.toLowerCase();
+            return l.title.toLowerCase().includes(q) || l.file.toLowerCase().includes(q) || l.id.includes(q);
+          }
+          return true;
+        });
+
+        if (filtered.length === 0) return;
+
+        const chBlock = document.createElement('div');
+        chBlock.className = 'rounded-xl bg-slate-950/50 border border-slate-800/80 overflow-hidden';
+
+        const header = document.createElement('div');
+        header.className = 'px-3 py-2 bg-slate-900/90 border-b border-slate-800/60 flex items-center justify-between';
+        header.innerHTML = `
+          <div>
+            <div class="text-[10px] font-mono uppercase tracking-wider text-cyan-400">${ch.number}</div>
+            <div class="text-xs font-semibold text-slate-200">${ch.title}</div>
+          </div>
+          <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">${filtered.length}</span>
+        `;
+        chBlock.appendChild(header);
+
+        const list = document.createElement('div');
+        list.className = 'divide-y divide-slate-800/40';
+
+        filtered.forEach(l => {
+          const isActive = (currentView === 'lesson' && currentLessonId === l.id);
+          const isDone = !!completedLessons[l.id];
+          const btn = document.createElement('button');
+          btn.className = 'w-full text-left px-3 py-2.5 transition flex items-start gap-2.5 ' +
+            (isActive ? 'bg-cyan-500/15 border-l-2 border-cyan-400' : 'hover:bg-slate-900/60');
+
+          const statusDot = l.status === 'have'
+            ? `<span class="w-2 h-2 rounded-full bg-emerald-400 mt-1.5 shrink-0" title="HTML File Ready"></span>`
+            : `<span class="w-2 h-2 rounded-full bg-amber-400 mt-1.5 shrink-0" title="Recommended New Topic"></span>`;
+
+          btn.innerHTML = `
+            ${statusDot}
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between gap-1">
+                <span class="text-[11px] font-mono ${isActive ? 'text-cyan-300 font-semibold' : 'text-slate-400'}">${l.id}</span>
+                ${isDone ? '<span class="text-[10px] text-emerald-400 font-mono">✓ Done</span>' : ''}
+              </div>
+              <div class="text-xs font-medium ${isActive ? 'text-white' : 'text-slate-300'} leading-snug mt-0.5">${l.title}</div>
+              <div class="text-[10px] font-mono text-slate-500 truncate mt-0.5">${l.file}</div>
+            </div>
+          `;
+          btn.addEventListener('click', () => {
+            openLesson(l.id);
+            closeMobileSidebar();
+          });
+          list.appendChild(btn);
+        });
+
+        chBlock.appendChild(list);
+        container.appendChild(chBlock);
+      });
+    }
+
+    // Render Interactive Mind Map on Overview
+    function renderMindMap() {
+      const grid = document.getElementById('mindMapGrid');
+      grid.innerHTML = '';
+
+      CHAPTERS.forEach(ch => {
+        const haveCount = ch.lessons.filter(l => l.status === 'have').length;
+        const card = document.createElement('div');
+        card.className = 'rounded-2xl bg-slate-900/60 border border-slate-800 p-5 flex flex-col justify-between space-y-4 hover:border-slate-700 transition';
+
+        let lessonsHtml = '';
+        ch.lessons.forEach(l => {
+          const badgeClass = l.status === 'have'
+            ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/20'
+            : 'bg-amber-500/10 text-amber-300 border-amber-500/30 hover:bg-amber-500/20';
+          const tagText = l.status === 'have' ? 'HAVE' : 'NEW';
+          lessonsHtml += `
+            <button data-lesson-id="${l.id}" class="mindmap-node w-full text-left p-2.5 rounded-xl bg-slate-950/80 hover:bg-slate-950 border border-slate-800/90 hover:border-cyan-500/50 transition group flex items-start justify-between gap-2">
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[11px] font-mono text-cyan-400">${l.id}</span>
+                  <span class="text-xs font-medium text-slate-200 group-hover:text-white truncate">${l.title}</span>
+                </div>
+                <div class="text-[10px] font-mono text-slate-500 truncate mt-0.5">${l.file}${l.secondaryFile ? ' + 1 more' : ''}</div>
+              </div>
+              <span class="shrink-0 text-[10px] font-mono px-1.5 py-0.5 rounded border ${badgeClass}">${tagText}</span>
+            </button>
+          `;
+        });
+
+        card.innerHTML = `
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-mono uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">${ch.number}</span>
+              <span class="text-xs font-mono text-slate-400">${haveCount}/${ch.lessons.length} HTML Ready</span>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-white">${ch.title}</h3>
+              <p class="text-xs text-slate-400 mt-0.5">${ch.subtitle}</p>
+            </div>
+            <div class="space-y-2 pt-1">
+              ${lessonsHtml}
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      grid.querySelectorAll('.mindmap-node').forEach(btn => {
+        btn.addEventListener('click', () => {
+          openLesson(btn.getAttribute('data-lesson-id'));
+        });
+      });
+    }
+
+    // Render Missing Topics View
+    function renderMissingTopics() {
+      const grid = document.getElementById('missingCardsGrid');
+      grid.innerHTML = '';
+      const missing = ALL_LESSONS.filter(l => l.status === 'missing');
+
+      missing.forEach((l, idx) => {
+        const card = document.createElement('div');
+        card.className = 'rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-3 flex flex-col justify-between';
+        card.innerHTML = `
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-mono text-amber-400 bg-amber-500/10 border border-amber-500/30 px-2.5 py-0.5 rounded-full">
+                Missing Topic #${idx + 1} • ${l.chapterNumber} (${l.id})
+              </span>
+              <span class="text-xs font-mono text-slate-400">${l.file}</span>
+            </div>
+            <h3 class="text-base font-bold text-white">${l.title}</h3>
+            <p class="text-xs text-slate-300 leading-relaxed">${l.summary}</p>
+            <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 text-[11px] font-mono text-cyan-300">
+              Equation to visualize: ${l.equation}
+            </div>
+          </div>
+          <div class="pt-2 flex items-center justify-between">
+            <span class="text-[11px] text-slate-400">Built-in interactive demo included in Lesson ${l.id}</span>
+            <button data-open-missing="${l.id}" class="px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 text-xs font-medium transition">
+              Preview Lesson &amp; Demo →
+            </button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      grid.querySelectorAll('[data-open-missing]').forEach(btn => {
+        btn.addEventListener('click', () => openLesson(btn.getAttribute('data-open-missing')));
+      });
+    }
+
+    // Open Specific Lesson
+    function openLesson(lessonId) {
+      const lesson = ALL_LESSONS.find(l => l.id === lessonId) || ALL_LESSONS[0];
+      currentLessonId = lesson.id;
+      activeSecondaryFile = false;
+      switchView('lesson');
+      renderSidebar();
+
+      document.getElementById('lessonChapterBadge').textContent = lesson.chapterNumber + ': ' + lesson.chapterTitle;
+      document.getElementById('lessonCodeBadge').textContent = 'Lesson ' + lesson.id;
+      document.getElementById('lessonTitle').textContent = lesson.id + ' — ' + lesson.title;
+      document.getElementById('lessonSummary').textContent = lesson.summary;
+      document.getElementById('lessonTheoryText').textContent = lesson.theory;
+      document.getElementById('lessonEquationBox').textContent = lesson.equation;
+      document.getElementById('lessonEquationDesc').textContent = lesson.equationDesc;
+      document.getElementById('lessonMissionText').textContent = lesson.mission;
+
+      // Status Pill & File Pill
+      const statusPill = document.getElementById('lessonStatusPill');
+      if (lesson.status === 'have') {
+        statusPill.className = 'px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-300 border border-emerald-500/30';
+        statusPill.textContent = '✓ Existing HTML Illustration (In Your 20 Files)';
+      } else {
+        statusPill.className = 'px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/15 text-amber-300 border border-amber-500/30';
+        statusPill.textContent = '★ Recommended New Illustration (Built-In Demo Ready)';
+      }
+
+      updateSimulationFileBinding(lesson);
+
+      // Exercises
+      const exList = document.getElementById('lessonExercisesList');
+      exList.innerHTML = '';
+      lesson.exercises.forEach((ex, i) => {
+        const li = document.createElement('li');
+        li.className = 'flex items-start gap-2.5 p-3 rounded-xl bg-slate-950/70 border border-slate-800/80';
+        li.innerHTML = `
+          <span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono text-xs flex items-center justify-center shrink-0 mt-0.5">${i + 1}</span>
+          <span>${ex}</span>
+        `;
+        exList.appendChild(li);
+      });
+
+      // If Lesson 3.6 has two HTML files (Spectral Diversity + Sentinel-1 ESD), add a toggle button
+      if (lesson.secondaryFile) {
+        const toggleDiv = document.createElement('li');
+        toggleDiv.className = 'p-3 rounded-xl bg-cyan-950/30 border border-cyan-500/30 flex items-center justify-between gap-2';
+        toggleDiv.innerHTML = `
+          <span class="text-xs text-cyan-200"><strong>Dual Simulation Lesson:</strong> This lesson pairs <code class="mono">${lesson.file}</code> and <code class="mono">${lesson.secondaryFile}</code>.</span>
+          <button id="toggleSecondaryFileBtn" class="px-3 py-1 rounded-lg bg-cyan-500 text-slate-950 font-semibold text-xs shrink-0">Switch HTML File</button>
+        `;
+        exList.prepend(toggleDiv);
+        setTimeout(() => {
+          const tBtn = document.getElementById('toggleSecondaryFileBtn');
+          if (tBtn) {
+            tBtn.addEventListener('click', () => {
+              activeSecondaryFile = !activeSecondaryFile;
+              updateSimulationFileBinding(lesson);
+              showToast('Switched bound HTML file to: ' + (activeSecondaryFile ? lesson.secondaryFile : lesson.file));
+            });
+          }
+        }, 0);
+      }
+
+      // Quiz
+      document.getElementById('quizQuestion').textContent = lesson.quiz.q;
+      const qOpts = document.getElementById('quizOptions');
+      const qFeed = document.getElementById('quizFeedback');
+      qOpts.innerHTML = '';
+      qFeed.className = 'hidden text-xs p-2.5 rounded-lg border';
+
+      lesson.quiz.options.forEach((opt, idx) => {
+        const b = document.createElement('button');
+        b.className = 'w-full text-left p-2.5 rounded-xl bg-slate-950 hover:bg-slate-900 border border-slate-800 text-xs text-slate-300 transition';
+        b.textContent = opt;
+        b.addEventListener('click', () => {
+          qFeed.classList.remove('hidden');
+          if (idx === lesson.quiz.answer) {
+            qFeed.className = 'text-xs p-2.5 rounded-lg border bg-emerald-500/15 border-emerald-500/40 text-emerald-300';
+            qFeed.textContent = '✓ Correct! Great physical intuition.';
+            completedLessons[lesson.id] = true;
+            saveProgress();
+            updateCompleteBtnUI();
+            renderSidebar();
+          } else {
+            qFeed.className = 'text-xs p-2.5 rounded-lg border bg-rose-500/15 border-rose-500/40 text-rose-300';
+            qFeed.textContent = 'Not quite — check the governing equation and try again.';
+          }
+        });
+        qOpts.appendChild(b);
+      });
+
+      // Prev / Next buttons
+      const idx = ALL_LESSONS.findIndex(l => l.id === lesson.id);
+      const prevBtn = document.getElementById('prevLessonBtn');
+      const nextBtn = document.getElementById('nextLessonBtn');
+      prevBtn.disabled = idx <= 0;
+      nextBtn.disabled = idx >= ALL_LESSONS.length - 1;
+      prevBtn.classList.toggle('opacity-40', idx <= 0);
+      nextBtn.classList.toggle('opacity-40', idx >= ALL_LESSONS.length - 1);
+
+      updateCompleteBtnUI();
+      setupInteractiveDemo(lesson);
+      setSimMode(currentSimMode);
+    }
+
+    function updateSimulationFileBinding(lesson) {
+      const targetFile = (activeSecondaryFile && lesson.secondaryFile) ? lesson.secondaryFile : lesson.file;
+      const relativeUrl = 'simulations/' + encodeURIComponent(targetFile).replace(/%20/g, ' ');
+      const encodedHref = 'simulations/' + encodeURIComponent(targetFile);
+
+      document.getElementById('lessonFilePill').textContent = relativeUrl;
+      document.getElementById('frameTitleBar').textContent = relativeUrl;
+      document.getElementById('iframeTargetCode').textContent = relativeUrl;
+      document.getElementById('openStandaloneLink').setAttribute('href', encodedHref);
+      const iframe = document.getElementById('simulationIframe');
+      if (iframe) iframe.setAttribute('src', encodedHref);
+    }
+
+    function updateCompleteBtnUI() {
+      const isDone = !!completedLessons[currentLessonId];
+      const icon = document.getElementById('markCompleteIcon');
+      const txt = document.getElementById('markCompleteText');
+      if (isDone) {
+        icon.className = 'w-3.5 h-3.5 rounded bg-emerald-400 text-slate-950 inline-flex items-center justify-center font-bold text-[10px]';
+        icon.textContent = '✓';
+        txt.textContent = 'Completed';
+      } else {
+        icon.className = 'w-3.5 h-3.5 rounded border border-slate-500 inline-flex items-center justify-center';
+        icon.textContent = '';
+        txt.textContent = 'Mark Lesson Complete';
+      }
+    }
+
+    function setSimMode(mode) {
+      currentSimMode = mode;
+      const extBox = document.getElementById('externalIframeContainer');
+      const demoBox = document.getElementById('builtinDemoContainer');
+      const btnIframe = document.getElementById('modeIframeBtn');
+      const btnSandbox = document.getElementById('modeSandboxBtn');
+
+      if (mode === 'iframe') {
+        extBox.classList.remove('hidden');
+        demoBox.classList.add('hidden');
+        btnIframe.className = 'px-2.5 py-1 rounded text-xs font-medium bg-cyan-500 text-slate-950 font-semibold transition';
+        btnSandbox.className = 'px-2.5 py-1 rounded text-xs font-medium bg-slate-800 text-slate-300 hover:text-white transition';
+      } else {
+        extBox.classList.add('hidden');
+        demoBox.classList.remove('hidden');
+        btnSandbox.className = 'px-2.5 py-1 rounded text-xs font-medium bg-cyan-500 text-slate-950 font-semibold transition';
+        btnIframe.className = 'px-2.5 py-1 rounded text-xs font-medium bg-slate-800 text-slate-300 hover:text-white transition';
+        drawInteractiveCanvas();
+      }
+    }
+
+    // Built-in HTML5 Canvas Interactive Visualizer for all 28 lessons
+    let currentDemoConfig = null;
+    function setupInteractiveDemo(lesson) {
+      const s1 = document.getElementById('slider1');
+      const s2 = document.getElementById('slider2');
+      const s3 = document.getElementById('slider3');
+      const l1 = document.getElementById('slider1Label');
+      const l2 = document.getElementById('slider2Label');
+      const l3 = document.getElementById('slider3Label');
+
+      currentDemoConfig = lesson.demoType;
+
+      const presets = {
+        antenna: ['Aperture Ratio (L/λ)', 'Sidelobe Taper', 'Steering Angle (°)', 45, 25, 20],
+        phase: ['Path Change Δr (mm)', 'Wavelength λ (cm)', 'Phase Noise', 40, 56, 15],
+        speckle: ['Number of Scatterers', 'Multi-Look Window', 'Edge Contrast', 50, 30, 65],
+        grid: ['Sub-Pixel Offset Δx', 'Sub-Pixel Offset Δy', 'Kernel Order', 35, 60, 75],
+        sinc: ['Fractional Shift Δt', 'Kernel Length N', 'Kaiser Window β', 40, 64, 50],
+        rgb: ['Pre-Event σ⁰ (Red)', 'Post-Event σ⁰ (Green)', 'Coherence / Ratio (Blue)', 75, 25, 60],
+        pipeline: ['Orbit/DEM Accuracy', 'Correlation Oversampling', 'Sinc Kernel Width', 80, 70, 85],
+        peak: ['Signal-to-Noise Ratio', 'Oversampling Factor', 'Surface Decorrelation', 75, 65, 20],
+        network: ['Number of Acquisitions N', 'Max Temporal Baseline', 'Phase Linking Iterations', 60, 45, 80],
+        tops: ['Azimuth Steering Rate', 'Misregistration (milli-px)', 'ESD Overlap Bandwidth', 70, 35, 80],
+        fringes: ['Perpendicular Baseline B⊥', 'Deformation / Height', 'Phase Noise (1 - γ)', 55, 65, 15],
+        coherence: ['True Coherence |γ|', 'Window Size (Looks)', 'Volume Decorrelation', 75, 45, 20],
+        vector: ['Vertical Motion d_Up', 'East-West Motion d_East', 'Incidence Angle θ (°)', 65, 40, 38],
+        geometry: ['Incidence Angle θ (°)', 'Mountain Slope α (°)', 'Chirp Bandwidth B', 42, 32, 70]
+      };
+
+      const p = presets[lesson.demoType] || presets.phase;
+      l1.textContent = p[0];
+      l2.textContent = p[1];
+      l3.textContent = p[2];
+      s1.value = p[3];
+      s2.value = p[4];
+      s3.value = p[5];
+
+      document.getElementById('slider1Val').textContent = s1.value;
+      document.getElementById('slider2Val').textContent = s2.value;
+      document.getElementById('slider3Val').textContent = s3.value;
+
+      drawInteractiveCanvas();
+    }
+
+    function drawInteractiveCanvas() {
+      const canvas = document.getElementById('interactiveCanvas');
+      if (!canvas) return;
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = Math.max(320, rect.width - 8);
+      canvas.height = 280;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+
+      const v1 = parseFloat(document.getElementById('slider1').value);
+      const v2 = parseFloat(document.getElementById('slider2').value);
+      const v3 = parseFloat(document.getElementById('slider3').value);
+      document.getElementById('slider1Val').textContent = v1;
+      document.getElementById('slider2Val').textContent = v2;
+      document.getElementById('slider3Val').textContent = v3;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Subtle background grid
+      ctx.strokeStyle = 'rgba(51, 65, 85, 0.35)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < w; x += 32) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+      }
+      for (let y = 0; y < h; y += 32) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+      }
+
+      const readout = document.getElementById('demoReadout');
+      const type = currentDemoConfig || 'phase';
+
+      if (type === 'antenna' || type === 'sinc') {
+        // Plot Sinc / Antenna pattern
+        const freq = 0.02 + (v1 / 100) * 0.08;
+        const taper = v2 / 100;
+        const steer = ((v3 - 50) / 50) * 80;
+        ctx.beginPath();
+        ctx.strokeStyle = '#22d3ee';
+        ctx.lineWidth = 2.5;
+        for (let x = 0; x < w; x++) {
+          const u = (x - w / 2 - steer) * freq;
+          const sinc = Math.abs(u) < 1e-4 ? 1 : Math.sin(Math.PI * u) / (Math.PI * u);
+          const win = 1 - taper * 0.6 * Math.min(1, Math.abs(u) / 4);
+          const val = sinc * Math.max(0.1, win);
+          const py = h * 0.68 - val * (h * 0.5);
+          if (x === 0) ctx.moveTo(x, py); else ctx.lineTo(x, py);
+        }
+        ctx.stroke();
+
+        // Zero axis
+        ctx.strokeStyle = 'rgba(148, 163, 184, 0.4)';
+        ctx.beginPath(); ctx.moveTo(0, h * 0.68); ctx.lineTo(w, h * 0.68); ctx.stroke();
+        readout.textContent = `Main-lobe width ∝ ${(100 / Math.max(10, v1)).toFixed(2)}° | Sidelobe suppression: -${(13 + v2 * 0.25).toFixed(1)} dB`;
+      } else if (type === 'fringes' || type === 'tops') {
+        // 2D Interferometric Fringes Strip + Wrapped Phase Profile
+        const rate = 0.03 + (v1 / 100) * 0.12;
+        const def = (v2 / 100) * 6;
+        const noise = (v3 / 100) * 1.8;
+
+        const stripH = 110;
+        for (let x = 0; x < w; x += 3) {
+          const r = (x - w / 2) / (w / 2);
+          const rawPhase = (x * rate) + def * Math.exp(-r * r * 4) + (Math.sin(x * 1.7) * noise);
+          const wrapped = ((rawPhase + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
+          const hue = ((wrapped + Math.PI) / (2 * Math.PI)) * 360;
+          ctx.fillStyle = `hsl(${hue}, 85%, 55%)`;
+          ctx.fillRect(x, 24, 3, stripH);
+        }
+
+        // Wrapped sawtooth profile below
+        ctx.beginPath();
+        ctx.strokeStyle = '#34d399';
+        ctx.lineWidth = 2;
+        for (let x = 0; x < w; x++) {
+          const r = (x - w / 2) / (w / 2);
+          const rawPhase = (x * rate) + def * Math.exp(-r * r * 4);
+          const wrapped = ((rawPhase + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
+          const py = 210 - (wrapped / Math.PI) * 45;
+          if (x === 0) ctx.moveTo(x, py); else ctx.lineTo(x, py);
+        }
+        ctx.stroke();
+        readout.textContent = `Wrapped [-π, +π) Fringe Cycles: ${(w * rate / (2 * Math.PI)).toFixed(1)} | Coherence γ ≈ ${(1 - v3 / 120).toFixed(2)}`;
+      } else if (type === 'phase' || type === 'vector') {
+        // Complex I/Q Phasor Circle + Wave
+        const cx = 110, cy = h / 2, rad = 75;
+        ctx.strokeStyle = '#475569';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.arc(cx, cy, rad, 0, Math.PI * 2); ctx.stroke();
+
+        const angle = -(4 * Math.PI * (v1 / 10)) / Math.max(1, v2 / 10);
+        const px = cx + rad * Math.cos(angle);
+        const py = cy + rad * Math.sin(angle);
+
+        ctx.strokeStyle = '#22d3ee';
+        ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(px, py); ctx.stroke();
+        ctx.fillStyle = '#34d399';
+        ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI * 2); ctx.fill();
+
+        // Wave on right
+        ctx.beginPath();
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 2;
+        for (let x = 220; x < w - 15; x++) {
+          const t = (x - 220) * 0.06 + angle;
+          const wy = cy + Math.sin(t) * 65;
+          if (x === 220) ctx.moveTo(x, wy); else ctx.lineTo(x, wy);
+        }
+        ctx.stroke();
+        readout.textContent = `Δφ = ${((angle % (2 * Math.PI)).toFixed(2))} rad | I = ${Math.cos(angle).toFixed(2)}, Q = ${Math.sin(angle).toFixed(2)}`;
+      } else {
+        // 2D Cross-Correlation Peak / Grid / Speckle / Network
+        const cx = w / 2 + ((v1 - 50) * 1.2);
+        const cy = h / 2 + ((v2 - 50) * 0.8);
+        for (let r = 90; r > 8; r -= 14) {
+          ctx.strokeStyle = `hsla(${190 - r}, 85%, 60%, ${0.9 - r / 120})`;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(cx, cy, r * (1 + v3 / 250), 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        ctx.fillStyle = '#10b981';
+        ctx.beginPath(); ctx.arc(cx, cy, 5, 0, Math.PI * 2); ctx.fill();
+        readout.textContent = `Sub-pixel offset: (${((v1 - 50) / 50).toFixed(3)}, ${((v2 - 50) / 50).toFixed(3)}) px | SNR: ${(25 - v3 * 0.18).toFixed(1)} dB`;
+      }
+    }
+
+    // Mobile Sidebar Controls
+    function openMobileSidebar() {
+      document.getElementById('sidebar').classList.remove('-translate-x-full');
+      document.getElementById('sidebarBackdrop').classList.remove('hidden');
+    }
+    function closeMobileSidebar() {
+      document.getElementById('sidebar').classList.add('-translate-x-full');
+      document.getElementById('sidebarBackdrop').classList.add('hidden');
+    }
+
+    // Wire All Event Listeners on Load
+    window.addEventListener('DOMContentLoaded', () => {
+      renderSidebar();
+      renderMindMap();
+      renderMissingTopics();
+      updateProgressUI();
+
+      // Top nav tabs
+      document.querySelectorAll('.nav-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const target = btn.getAttribute('data-nav');
+          if (target === 'lesson') openLesson(currentLessonId);
+          else switchView(target);
+        });
+      });
+
+      document.getElementById('brandLink').addEventListener('click', (e) => {
+        e.preventDefault();
+        switchView('overview');
+      });
+
+      document.getElementById('startFirstLessonBtn').addEventListener('click', () => openLesson('1.2'));
+      document.getElementById('jumpToGapsBtn').addEventListener('click', () => switchView('gaps'));
+      document.getElementById('jumpToGithubBtn').addEventListener('click', () => switchView('github'));
+      document.getElementById('openGithubModalBtn').addEventListener('click', () => switchView('github'));
+      document.getElementById('backToMapBtn').addEventListener('click', () => switchView('overview'));
+
+      // Filter chips
+      document.querySelectorAll('.filter-chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+          sidebarFilter = btn.getAttribute('data-filter');
+          document.querySelectorAll('.filter-chip').forEach(c => {
+            const active = c.getAttribute('data-filter') === sidebarFilter;
+            c.className = 'filter-chip flex-1 py-1 rounded-md text-[11px] font-medium ' +
+              (active ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40' : 'bg-slate-800 text-slate-400 hover:text-slate-200 border border-transparent');
+          });
+          renderSidebar();
+        });
+      });
+
+      // Search input
+      document.getElementById('searchInput').addEventListener('input', (e) => {
+        searchQuery = e.target.value.trim();
+        renderSidebar();
+      });
+
+      // Lesson controls
+      document.getElementById('markCompleteBtn').addEventListener('click', () => {
+        completedLessons[currentLessonId] = !completedLessons[currentLessonId];
+        saveProgress();
+        updateCompleteBtnUI();
+        renderSidebar();
+      });
+
+      document.getElementById('prevLessonBtn').addEventListener('click', () => {
+        const idx = ALL_LESSONS.findIndex(l => l.id === currentLessonId);
+        if (idx > 0) openLesson(ALL_LESSONS[idx - 1].id);
+      });
+
+      document.getElementById('nextLessonBtn').addEventListener('click', () => {
+        const idx = ALL_LESSONS.findIndex(l => l.id === currentLessonId);
+        if (idx < ALL_LESSONS.length - 1) openLesson(ALL_LESSONS[idx + 1].id);
+      });
+
+      // Mode buttons
+      document.getElementById('modeIframeBtn').addEventListener('click', () => setSimMode('iframe'));
+      document.getElementById('modeSandboxBtn').addEventListener('click', () => setSimMode('sandbox'));
+      document.getElementById('switchToDemoBtn').addEventListener('click', () => setSimMode('sandbox'));
+
+      // Sliders
+      ['slider1', 'slider2', 'slider3'].forEach(id => {
+        document.getElementById(id).addEventListener('input', drawInteractiveCanvas);
+      });
+
+      window.addEventListener('resize', () => {
+        if (currentView === 'lesson' && currentSimMode === 'sandbox') drawInteractiveCanvas();
+      });
+
+      // Mobile menu
+      document.getElementById('mobileMenuBtn').addEventListener('click', openMobileSidebar);
+      document.getElementById('sidebarBackdrop').addEventListener('click', closeMobileSidebar);
+
+      // Copy Git commands
+      document.getElementById('copyGitCommandsBtn').addEventListener('click', () => {
+        const text = document.getElementById('gitCommandsBlock').textContent;
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (e) {}
+        document.body.removeChild(ta);
+        showToast('Git commands copied to clipboard!');
+      });
+    });
+  </script>
+</body>
+</html>
