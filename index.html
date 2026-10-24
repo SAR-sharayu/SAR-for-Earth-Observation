@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,13 +7,13 @@
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
-      darkMode: 'class',
       theme: {
         extend: {
           fontFamily: {
+            serif: ['"Playfair Display"', '"Times New Roman"', 'Times', 'Georgia', 'serif'],
             sans: ['Inter', 'sans-serif'],
             mono: ['JetBrains Mono', 'monospace']
           }
@@ -22,282 +22,129 @@
     }
   </script>
   <style>
-    body { font-family: 'Inter', sans-serif; }
-    .mono { font-family: 'JetBrains Mono', monospace; }
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.3); border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.5); }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #FAF7F5;
+      color: #291D20;
+    }
+    .heading-serif {
+      font-family: 'Playfair Display', 'Times New Roman', Times, Georgia, serif;
+    }
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #F5ECEE; }
+    ::-webkit-scrollbar-thumb { background: #D8B4BC; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #B88692; }
+
+    /* Ensure simulation iframe container is always scrollable and resizable */
+    .sim-viewport {
+      width: 100%;
+      height: 820px;
+      min-height: 520px;
+      max-height: 1600px;
+      overflow: auto;
+      resize: vertical;
+      -webkit-overflow-scrolling: touch;
+      background: #FFFFFF;
+    }
+    .sim-iframe-wrap {
+      width: 100%;
+      height: 100%;
+      transform-origin: top left;
+      transition: transform 0.15s ease;
+    }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-cyan-500 selection:text-slate-950 overflow-x-hidden">
+<body class="min-h-screen flex flex-col selection:bg-rose-200 selection:text-rose-950 overflow-x-hidden">
 
   <!-- Top Navbar -->
-  <header class="sticky top-0 z-40 h-16 border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-md px-4 lg:px-8 flex items-center justify-between">
+  <header class="sticky top-0 z-40 h-16 border-b border-rose-200/80 bg-[#FAF7F5]/95 backdrop-blur-md px-4 lg:px-10 flex items-center justify-between">
     <div class="flex items-center gap-3">
       <a href="#view-overview" id="brandLink" class="flex items-center gap-3 group">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
-          <svg class="w-5 h-5 text-slate-950" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+        <div class="w-9 h-9 rounded-xl bg-rose-800 text-rose-50 flex items-center justify-center shadow-sm group-hover:bg-rose-900 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9.348 14.651a3.75 3.75 0 010-5.303m5.304 0a3.75 3.75 0 010 5.303m-7.425 2.122a6.75 6.75 0 010-9.546m9.546 0a6.75 6.75 0 010 9.546M5.106 18.894c-3.808-3.808-3.808-9.98 0-13.789m13.788 0c3.808 3.808 3.808 9.981 0 13.79M12 12h.008v.007H12V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
           </svg>
         </div>
         <div>
-          <span class="font-bold tracking-tight text-white text-base sm:text-lg flex items-center gap-2">
-            SAR<span class="text-cyan-400">EO</span>
-            <span class="hidden sm:inline-block text-[11px] font-medium text-slate-400 border-l border-slate-800 pl-2.5">by Sharayu</span>
+          <span class="heading-serif font-bold tracking-tight text-stone-900 text-lg sm:text-xl flex items-center gap-2">
+            SAR <span class="text-rose-800">Earth Observation</span>
+            <span class="hidden sm:inline-block font-sans text-xs font-normal text-stone-500 border-l border-rose-200 pl-2.5">by Sharayu</span>
           </span>
-          <p class="text-xs text-slate-400 hidden sm:block">Microwave Remote Sensing &amp; InSAR for Earth Observation</p>
         </div>
       </a>
     </div>
 
     <!-- Top Navigation Tabs -->
-    <nav class="flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800">
-      <button data-nav="overview" class="nav-tab px-4 py-1.5 rounded-lg text-xs font-medium transition bg-cyan-500 text-slate-950 font-semibold">
+    <nav class="flex items-center gap-1 bg-rose-100/70 p-1 rounded-xl border border-rose-200/80">
+      <button data-nav="overview" class="nav-tab px-4 py-1.5 rounded-lg text-xs font-semibold transition bg-rose-800 text-white shadow-sm">
         Contents
       </button>
-      <button data-nav="lesson" class="nav-tab px-4 py-1.5 rounded-lg text-xs font-medium transition text-slate-300 hover:text-white">
+      <button data-nav="lesson" class="nav-tab px-4 py-1.5 rounded-lg text-xs font-medium transition text-stone-700 hover:text-rose-900">
         Interactive Lessons
       </button>
     </nav>
 
     <!-- Right Controls -->
     <div class="flex items-center gap-3">
-      <div class="hidden md:flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5">
-        <span class="text-xs text-slate-400">Completed:</span>
-        <span id="progressBadge" class="text-xs font-mono font-semibold text-emerald-400">0 / 28</span>
+      <div class="hidden md:flex items-center gap-2 bg-white border border-rose-200/80 rounded-lg px-3 py-1.5 shadow-sm">
+        <span class="text-xs text-stone-500">Completed:</span>
+        <span id="progressBadge" class="text-xs font-mono font-semibold text-rose-800">0 / 28</span>
       </div>
     </div>
   </header>
 
-  <!-- Main Workspace Container (Full-width centered without redundant left sidebar) -->
+  <!-- Main Workspace Container -->
   <main class="flex-1 min-w-0 p-4 sm:p-6 lg:p-10 max-w-6xl mx-auto w-full">
 
-    <!-- VIEW 1: CONTENTS & EARTH OBSERVATION COURSE LANDING PAGE -->
-    <section id="view-overview" class="space-y-12">
+    <!-- VIEW 1: CLEAN EDITORIAL TITLE HEADER + CONTENTS + SAR MAP SHOWCASE + MISSIONS -->
+    <section id="view-overview" class="space-y-14">
 
-      <!-- Course Hero Banner -->
-      <div class="rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-cyan-950/40 border border-slate-800 p-6 sm:p-10 relative overflow-hidden">
-        <div class="max-w-3xl space-y-4 relative z-10">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-medium">
-            <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
-            Interactive Earth Observation Curriculum • Curated by Sharayu
+      <!-- Minimalist Editorial Title Header (No Big Box!) -->
+      <div class="pt-4 pb-8 border-b border-rose-200/80 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div class="space-y-3 max-w-3xl">
+          <div class="text-xs font-semibold uppercase tracking-widest text-rose-800">
+            Interactive Remote Sensing Curriculum • By Sharayu
           </div>
-          <h1 class="text-2xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight leading-tight">
+          <h1 class="heading-serif text-3xl sm:text-5xl lg:text-[54px] font-bold text-stone-900 tracking-tight leading-[1.12]">
             Synthetic Aperture Radar for Earth Observation
           </h1>
-          <p class="text-sm sm:text-base text-slate-300 leading-relaxed">
-            Learn how spaceborne imaging radars see through clouds and darkness to map our changing planet. This interactive course guides you from electromagnetic wave physics and synthetic aperture focusing to Sentinel-1 TOPS co-registration, SAR Interferometry (InSAR), and millimeter-scale tectonic and climate monitoring.
-          </p>
-          <div class="flex flex-wrap items-center gap-3 pt-2">
-            <button id="startFirstLessonBtn" class="px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold text-xs sm:text-sm transition shadow-lg shadow-cyan-500/20 flex items-center gap-2">
-              <span>Start Chapter 1</span>
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
-            </button>
-            <a href="#course-contents" class="px-4 py-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-800 text-slate-200 font-medium text-xs sm:text-sm border border-slate-700 transition">
-              Browse Course Contents
-            </a>
-            <a href="#satellite-missions" class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 font-medium text-xs sm:text-sm border border-slate-800 transition">
-              Explore SAR Satellite Missions
-            </a>
-          </div>
-        </div>
-
-        <!-- Scientific Key Figures Row -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 mt-8 pt-6 border-t border-slate-800/80">
-          <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-3.5">
-            <div class="text-xs text-slate-400">All-Weather Imaging</div>
-            <div class="text-lg sm:text-xl font-bold text-white mt-0.5">24/7 Day &amp; Night</div>
-            <div class="text-[11px] text-cyan-400 mt-1">Penetrates clouds, smoke &amp; rain</div>
-          </div>
-          <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-3.5">
-            <div class="text-xs text-slate-400">InSAR Precision</div>
-            <div class="text-lg sm:text-xl font-bold text-emerald-400 mt-0.5">Millimeter Scale</div>
-            <div class="text-[11px] text-slate-400 mt-1">Tracks faults, volcanoes &amp; subsidence</div>
-          </div>
-          <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-3.5">
-            <div class="text-xs text-slate-400">Microwave Spectrum</div>
-            <div class="text-lg sm:text-xl font-bold text-amber-400 mt-0.5">X, C, L &amp; P Bands</div>
-            <div class="text-[11px] text-slate-400 mt-1">3 cm to 70 cm radar wavelengths</div>
-          </div>
-          <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-3.5">
-            <div class="text-xs text-slate-400">Course Structure</div>
-            <div class="text-lg sm:text-xl font-bold text-indigo-400 mt-0.5">6 Chapters</div>
-            <div class="text-[11px] text-slate-400 mt-1">28 interactive signal &amp; InSAR labs</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- SECTION A: WHAT IS SYNTHETIC APERTURE RADAR & HOW SATELLITES USE IT -->
-      <div class="space-y-5">
-        <div>
-          <span class="text-xs font-mono uppercase tracking-wider text-cyan-400">Fundamentals of Microwave Remote Sensing</span>
-          <h2 class="text-xl sm:text-2xl font-bold text-white mt-1">What is Synthetic Aperture Radar (SAR)?</h2>
-          <p class="text-sm text-slate-300 mt-1 max-w-4xl leading-relaxed">
-            Optical satellites (like Landsat or Sentinel-2) work like passive cameras—they depend on sunlight and are blinded by clouds, monsoon cover, polar night, or wildfire smoke. <strong>Synthetic Aperture Radar (SAR)</strong> is an <em>active</em> microwave sensor: it transmits its own electromagnetic pulses (centimeter-to-decimeter wavelengths) toward Earth and records both the <strong>amplitude</strong> (strength) and <strong>phase</strong> (exact travel-time fraction of a wavelength) of the backscattered echoes.
+          <p class="text-sm sm:text-base text-stone-600 leading-relaxed pt-1">
+            An interactive visual guide to active microwave imaging, radar signal processing, Sentinel-1 TOPS co-registration, and SAR Interferometry (InSAR) for mapping Earth's surface motion, hazards, and ecosystems.
           </p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-2.5">
-            <div class="w-8 h-8 rounded-lg bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-mono text-xs font-bold">01</div>
-            <h3 class="text-base font-bold text-white">Synthesizing a Giant Antenna in Orbit</h3>
-            <p class="text-xs text-slate-300 leading-relaxed">
-              From an 800 km orbit, a real radar antenna would need to be several kilometers long to focus a sharp 5-meter pixel on the ground. Instead, SAR uses the forward orbital motion of the satellite (~7.5 km/s) to coherently combine thousands of radar echoes along the flight track—synthesizing a virtual antenna kilometers in length.
-            </p>
-          </div>
-
-          <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-2.5">
-            <div class="w-8 h-8 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-mono text-xs font-bold">02</div>
-            <h3 class="text-base font-bold text-white">Amplitude vs. Coherent Phase</h3>
-            <p class="text-xs text-slate-300 leading-relaxed">
-              Every focused SAR pixel is a complex number <span class="mono text-cyan-300">z = I + jQ</span>. The <strong>amplitude</strong> reveals surface roughness, soil moisture, flood water, and forest structure. The <strong>phase</strong> measures the two-way distance to the ground within a fraction of the radar wavelength—enabling interferometry (InSAR) to detect millimeter surface motion.
-            </p>
-          </div>
-
-          <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-2.5">
-            <div class="w-8 h-8 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 font-mono text-xs font-bold">03</div>
-            <h3 class="text-base font-bold text-white">Wavelength Penetration &amp; Polarimetry</h3>
-            <p class="text-xs text-slate-300 leading-relaxed">
-              Different radar bands interact with different scales of matter: short <strong>X-band (3 cm)</strong> reflects from urban roofs and top leaves; <strong>C-band (5.6 cm)</strong> senses crops and ocean winds; long <strong>L-band (24 cm)</strong> and <strong>P-band (70 cm)</strong> penetrate dense forest canopies to map tree trunks, biomass, and sub-canopy ground motion.
-            </p>
-          </div>
+        <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+          <button id="startFirstLessonBtn" class="px-5 py-2.5 rounded-xl bg-rose-800 hover:bg-rose-900 text-white font-semibold text-xs sm:text-sm transition shadow-sm flex items-center gap-2">
+            <span>Start Lesson 1.1</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+          </button>
+          <a href="#course-contents" class="px-4 py-2.5 rounded-xl bg-white hover:bg-rose-50 text-stone-700 font-medium text-xs sm:text-sm border border-rose-200 transition">
+            Jump to Chapters
+          </a>
         </div>
       </div>
 
-      <!-- SECTION B: GLOBAL SAR SATELLITE MISSIONS & WHAT THEY DO -->
-      <div id="satellite-missions" class="space-y-5 scroll-mt-20">
-        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
-          <div>
-            <span class="text-xs font-mono uppercase tracking-wider text-indigo-400">Spaceborne Radar Fleet</span>
-            <h2 class="text-xl sm:text-2xl font-bold text-white mt-1">Major SAR Satellite Missions &amp; Applications</h2>
-            <p class="text-xs sm:text-sm text-slate-400 mt-0.5">How operational radar satellites across X, C, S, L, and P bands monitor Earth systems.</p>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <!-- Mission 1 -->
-          <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-3 flex flex-col justify-between">
-            <div class="space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-white">Sentinel-1 (1A / 1C)</span>
-                <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">C-Band (5.6 cm)</span>
-              </div>
-              <div class="text-[11px] text-slate-400 font-mono">ESA Copernicus • TOPSAR IW Mode (250 km swath)</div>
-              <p class="text-xs text-slate-300 leading-relaxed">
-                The backbone of open-access global radar monitoring. Uses Terrain Observation with Progressive Scans (TOPS) to deliver 6-to-12 day repeat-pass InSAR worldwide.
-              </p>
-            </div>
-            <div class="pt-2 border-t border-slate-800/80 text-[11px] text-slate-400">
-              <strong class="text-slate-200">Key Uses:</strong> Tectonic faults, urban land subsidence, rapid flood mapping, sea-ice shipping routes, and oil-spill detection.
-            </div>
-          </div>
-
-          <!-- Mission 2 -->
-          <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-3 flex flex-col justify-between">
-            <div class="space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-white">NISAR (NASA–ISRO)</span>
-                <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">L-Band (24 cm) + S-Band (9.4 cm)</span>
-              </div>
-              <div class="text-[11px] text-slate-400 font-mono">NASA &amp; ISRO • SweepSAR (240 km swath)</div>
-              <p class="text-xs text-slate-300 leading-relaxed">
-                First dual-frequency spaceborne radar with a 12-meter deployable mesh reflector. L-band penetrates heavy vegetation where C-band loses coherence, while S-band characterizes crops and polar snow.
-              </p>
-            </div>
-            <div class="pt-2 border-t border-slate-800/80 text-[11px] text-slate-400">
-              <strong class="text-slate-200">Key Uses:</strong> Himalayan &amp; San Andreas crustal deformation, glacier ice-sheet dynamics, forest biomass, and agricultural soil moisture.
-            </div>
-          </div>
-
-          <!-- Mission 3 -->
-          <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-3 flex flex-col justify-between">
-            <div class="space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-white">ALOS-2 / ALOS-4 (PALSAR)</span>
-                <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">L-Band (23.6 cm)</span>
-              </div>
-              <div class="text-[11px] text-slate-400 font-mono">JAXA (Japan) • Quad-Pol &amp; ScanSAR</div>
-              <p class="text-xs text-slate-300 leading-relaxed">
-                Long-wavelength L-band radar capable of full quad-polarization (HH, HV, VH, VV) and high-coherence interferometry across densely forested mountains and volcanic arcs.
-              </p>
-            </div>
-            <div class="pt-2 border-t border-slate-800/80 text-[11px] text-slate-400">
-              <strong class="text-slate-200">Key Uses:</strong> Tropical deforestation alerts (JJ-FAST), forested landslide creep, volcanic unrest, and earthquake slip inversion.
-            </div>
-          </div>
-
-          <!-- Mission 4 -->
-          <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-3 flex flex-col justify-between">
-            <div class="space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-white">TerraSAR-X / TanDEM-X &amp; COSMO-SkyMed</span>
-                <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">X-Band (3.1 cm)</span>
-              </div>
-              <div class="text-[11px] text-slate-400 font-mono">DLR &amp; ASI • Spotlight &amp; Bistatic Interferometry</div>
-              <p class="text-xs text-slate-300 leading-relaxed">
-                High-frequency, sub-meter resolution radars. TanDEM-X flew two satellites in close helix formation to acquire single-pass interferograms without atmospheric or temporal decorrelation.
-              </p>
-            </div>
-            <div class="pt-2 border-t border-slate-800/80 text-[11px] text-slate-400">
-              <strong class="text-slate-200">Key Uses:</strong> Global WorldDEM generation, bridge &amp; dam structural stability, urban persistent scatterers, and high-res disaster response.
-            </div>
-          </div>
-
-          <!-- Mission 5 -->
-          <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-3 flex flex-col justify-between">
-            <div class="space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-white">EOS-04 (RISAT-1A) &amp; RADARSAT</span>
-                <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">C-Band (5.6 cm)</span>
-              </div>
-              <div class="text-[11px] text-slate-400 font-mono">ISRO &amp; CSA • Hybrid / Compact Polarimetry</div>
-              <p class="text-xs text-slate-300 leading-relaxed">
-                Operational all-weather radar missions designed for monsoon agriculture, hydrology, and maritime domain awareness using linear and circular hybrid polarimetric modes.
-              </p>
-            </div>
-            <div class="pt-2 border-t border-slate-800/80 text-[11px] text-slate-400">
-              <strong class="text-slate-200">Key Uses:</strong> Kharif paddy crop monitoring during monsoon clouds, soil moisture estimation, flood inundation, and coastal surveillance.
-            </div>
-          </div>
-
-          <!-- Mission 6 -->
-          <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-3 flex flex-col justify-between">
-            <div class="space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-white">BIOMASS (ESA Earth Explorer)</span>
-                <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-purple-500/15 text-purple-300 border border-purple-500/30">P-Band (70 cm)</span>
-              </div>
-              <div class="text-[11px] text-slate-400 font-mono">ESA • Full Polarimetric &amp; Tomographic SAR</div>
-              <p class="text-xs text-slate-300 leading-relaxed">
-                The longest-wavelength spaceborne SAR ever flown (435 MHz). Its 70 cm waves pierce completely through dense tropical rainforest canopies to the forest floor.
-              </p>
-            </div>
-            <div class="pt-2 border-t border-slate-800/80 text-[11px] text-slate-400">
-              <strong class="text-slate-200">Key Uses:</strong> 3D SAR tomography of tropical forest structure, above-ground carbon stock mapping, and sub-surface desert paleo-hydrology.
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- SECTION C: COURSE CONTENTS (6 CHAPTERS & 28 INTERACTIVE MODULES) -->
+      <!-- SECTION 1: COURSE CONTENTS (6 CHAPTERS & 28 LESSONS) -->
       <div id="course-contents" class="space-y-5 scroll-mt-20">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2">
           <div>
-            <span class="text-xs font-mono uppercase tracking-wider text-cyan-400">Structured Learning Path</span>
-            <h2 class="text-xl sm:text-2xl font-bold text-white mt-1">Course Contents &amp; Interactive Simulations</h2>
-            <p class="text-xs sm:text-sm text-slate-400 mt-0.5">Select any lesson below to launch its interactive simulation, mathematical formulation, and guided exercises.</p>
+            <span class="text-xs font-semibold uppercase tracking-widest text-rose-800">Curriculum Syllabus</span>
+            <h2 class="heading-serif text-2xl sm:text-3xl font-bold text-stone-900 mt-0.5">Chapters &amp; Interactive Illustrations</h2>
+            <p class="text-xs sm:text-sm text-stone-600 mt-0.5">Click any topic below to open its interactive simulation, mathematical equations, and guided lab tasks.</p>
           </div>
 
-          <!-- Search & Filter Bar right above the Contents Grid -->
+          <!-- Search & Filter Bar -->
           <div class="flex flex-wrap items-center gap-2">
             <div class="relative w-full sm:w-64">
-              <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-              <input id="searchInput" type="text" placeholder="Search lessons or concepts..." class="w-full bg-slate-900 border border-slate-800 focus:border-cyan-500 rounded-xl pl-9 pr-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none">
+              <svg class="w-4 h-4 text-stone-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+              <input id="searchInput" type="text" placeholder="Search chapters or topics..." class="w-full bg-white border border-rose-200 focus:border-rose-700 rounded-xl pl-9 pr-3 py-1.5 text-xs text-stone-800 placeholder-stone-400 focus:outline-none shadow-sm">
             </div>
-            <div class="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
-              <button data-filter="all" class="filter-chip px-2.5 py-1 rounded-lg text-[11px] font-medium bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">All (28)</button>
-              <button data-filter="have" class="filter-chip px-2.5 py-1 rounded-lg text-[11px] font-medium text-slate-400 hover:text-slate-200 border border-transparent">Simulations (20)</button>
+            <div class="flex items-center gap-1 bg-rose-100/70 p-1 rounded-xl border border-rose-200">
+              <button data-filter="all" class="filter-chip px-3 py-1 rounded-lg text-[11px] font-semibold bg-rose-800 text-white shadow-sm">All (28)</button>
+              <button data-filter="have" class="filter-chip px-3 py-1 rounded-lg text-[11px] font-medium text-stone-700 hover:text-rose-900">Simulations (20)</button>
             </div>
           </div>
         </div>
@@ -305,117 +152,245 @@
         <div id="mindMapGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5"></div>
       </div>
 
+      <!-- SECTION 2: SAR MAPS & INTERFEROGRAM GALLERY BY SHARAYU -->
+      <div id="sar-maps-gallery" class="space-y-5 pt-4 border-t border-rose-200/80 scroll-mt-20">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+          <div>
+            <span class="text-xs font-semibold uppercase tracking-widest text-rose-800">Earth Observation Showcase</span>
+            <h2 class="heading-serif text-2xl sm:text-3xl font-bold text-stone-900 mt-0.5">SAR Maps &amp; Interferograms Gallery</h2>
+            <p class="text-xs sm:text-sm text-stone-600 mt-0.5">
+              Explore what real spaceborne SAR backscatter, coherence, and InSAR displacement maps look like across different terrains.
+            </p>
+          </div>
+
+          <!-- Category Filter Tabs for SAR Maps -->
+          <div class="flex flex-wrap items-center gap-1 bg-rose-100/70 p-1 rounded-xl border border-rose-200">
+            <button data-map-cat="all" class="map-cat-btn px-3 py-1 rounded-lg text-xs font-semibold bg-rose-800 text-white shadow-sm">All Maps</button>
+            <button data-map-cat="insar" class="map-cat-btn px-3 py-1 rounded-lg text-xs font-medium text-stone-700 hover:text-rose-900">InSAR Deformation</button>
+            <button data-map-cat="rgb" class="map-cat-btn px-3 py-1 rounded-lg text-xs font-medium text-stone-700 hover:text-rose-900">Flood &amp; RGB</button>
+            <button data-map-cat="coherence" class="map-cat-btn px-3 py-1 rounded-lg text-xs font-medium text-stone-700 hover:text-rose-900">Coherence &amp; PolSAR</button>
+          </div>
+        </div>
+
+        <div id="sarMapsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"></div>
+      </div>
+
+      <!-- SECTION 3: CONCISE OVERVIEW OF SAR & SATELLITE MISSIONS -->
+      <div id="satellite-missions" class="space-y-8 pt-4 border-t border-rose-200/80 scroll-mt-20">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-1 space-y-2">
+            <span class="text-xs font-semibold uppercase tracking-widest text-rose-800">Why Active Microwave Radar?</span>
+            <h2 class="heading-serif text-2xl sm:text-3xl font-bold text-stone-900">How Satellites Image Earth with SAR</h2>
+            <p class="text-xs sm:text-sm text-stone-600 leading-relaxed pt-1">
+              Unlike passive optical cameras that rely on sunlight and are blocked by clouds or smoke, Synthetic Aperture Radar transmits its own microwave pulses (3 cm to 70 cm wavelength) and records both <strong>backscatter amplitude</strong> and <strong>coherent phase</strong> day and night.
+            </p>
+          </div>
+
+          <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="rounded-2xl bg-white border border-rose-200/80 p-5 shadow-sm space-y-2">
+              <div class="text-xs font-mono font-semibold text-rose-800">01 • VIRTUAL APERTURE</div>
+              <h3 class="heading-serif text-base font-bold text-stone-900">Doppler Beam Sharpening</h3>
+              <p class="text-xs text-stone-600 leading-relaxed">
+                By coherently combining radar echoes along the satellite's 7.5 km/s orbital path, a 10-meter antenna synthesizes a virtual aperture several kilometers wide.
+              </p>
+            </div>
+            <div class="rounded-2xl bg-white border border-rose-200/80 p-5 shadow-sm space-y-2">
+              <div class="text-xs font-mono font-semibold text-rose-800">02 • MILLIMETER PHASE</div>
+              <h3 class="heading-serif text-base font-bold text-stone-900">Interferometry (InSAR)</h3>
+              <p class="text-xs text-stone-600 leading-relaxed">
+                Comparing phase differences between two satellite passes (<span class="mono text-rose-900">Δφ = 4πΔr/λ</span>) reveals millimeter-scale fault slip, volcano inflation, and urban subsidence.
+              </p>
+            </div>
+            <div class="rounded-2xl bg-white border border-rose-200/80 p-5 shadow-sm space-y-2">
+              <div class="text-xs font-mono font-semibold text-rose-800">03 • MULTI-BAND PENETRATION</div>
+              <h3 class="heading-serif text-base font-bold text-stone-900">X, C, L &amp; P Wavelengths</h3>
+              <p class="text-xs text-stone-600 leading-relaxed">
+                Short X/C-bands scatter off building roofs, ocean waves, and crops, while longer L/P-bands pierce through forest canopies to map trunks and ground motion.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Compact Table/Grid of Spaceborne SAR Missions -->
+        <div class="space-y-3">
+          <h3 class="heading-serif text-xl font-bold text-stone-900">Spaceborne SAR Missions at a Glance</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="rounded-2xl bg-white border border-rose-200/80 p-4 shadow-sm space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-sm text-stone-900">Sentinel-1 (ESA Copernicus)</span>
+                <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-rose-100 text-rose-900 font-medium">C-Band • 5.6 cm</span>
+              </div>
+              <p class="text-xs text-stone-600 leading-relaxed">250 km TOPSAR Interferometric Wide swath with 6–12 day global repeat for tectonic faults, subsidence, floods, and sea ice.</p>
+            </div>
+
+            <div class="rounded-2xl bg-white border border-rose-200/80 p-4 shadow-sm space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-sm text-stone-900">NISAR (NASA–ISRO)</span>
+                <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-rose-100 text-rose-900 font-medium">L + S Band • 24 &amp; 9.4 cm</span>
+              </div>
+              <p class="text-xs text-stone-600 leading-relaxed">Dual-frequency SweepSAR penetratating heavy vegetation to track Himalayan &amp; San Andreas deformation, glaciers, and biomass.</p>
+            </div>
+
+            <div class="rounded-2xl bg-white border border-rose-200/80 p-4 shadow-sm space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-sm text-stone-900">ALOS-2 / ALOS-4 (JAXA)</span>
+                <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-rose-100 text-rose-900 font-medium">L-Band • 23.6 cm</span>
+              </div>
+              <p class="text-xs text-stone-600 leading-relaxed">Quad-polarimetric L-band PALSAR for tropical deforestation alerts, forested landslide creep, and volcanic unrest.</p>
+            </div>
+
+            <div class="rounded-2xl bg-white border border-rose-200/80 p-4 shadow-sm space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-sm text-stone-900">TerraSAR-X / TanDEM-X (DLR)</span>
+                <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-rose-100 text-rose-900 font-medium">X-Band • 3.1 cm</span>
+              </div>
+              <p class="text-xs text-stone-600 leading-relaxed">Sub-meter spotlight resolution and bistatic single-pass interferometry for global DEM generation and urban infrastructure.</p>
+            </div>
+
+            <div class="rounded-2xl bg-white border border-rose-200/80 p-4 shadow-sm space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-sm text-stone-900">EOS-04 / RISAT-1A (ISRO)</span>
+                <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-rose-100 text-rose-900 font-medium">C-Band • 5.6 cm</span>
+              </div>
+              <p class="text-xs text-stone-600 leading-relaxed">All-weather hybrid polarimetric radar supporting monsoon crop monitoring, hydrology, soil moisture, and flood mapping.</p>
+            </div>
+
+            <div class="rounded-2xl bg-white border border-rose-200/80 p-4 shadow-sm space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-sm text-stone-900">BIOMASS (ESA)</span>
+                <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-rose-100 text-rose-900 font-medium">P-Band • 70 cm</span>
+              </div>
+              <p class="text-xs text-stone-600 leading-relaxed">Ultra-long 70 cm wavelength polarimetric &amp; tomographic radar piercing dense rainforest canopies to map global forest carbon.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </section>
 
-    <!-- VIEW 2: LESSON VIEWER (IFRAME + BUILT-IN LIVE PREVIEW + THEORY) -->
+    <!-- VIEW 2: LESSON VIEWER (SCROLLABLE/ZOOMABLE SIMULATION BOX + THEORY) -->
     <section id="view-lesson" class="hidden space-y-6">
       <!-- Breadcrumb, Quick Lesson Switcher & Navigation Controls -->
-      <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-800">
-        <div class="flex flex-wrap items-center gap-2 text-xs text-slate-400">
-          <button id="backToMapBtn" class="px-2.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 hover:border-cyan-500/40 transition flex items-center gap-1.5">
-            <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-            <span>All Contents</span>
+      <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-rose-200">
+        <div class="flex flex-wrap items-center gap-2 text-xs text-stone-500">
+          <button id="backToMapBtn" class="px-3 py-1.5 rounded-lg bg-white hover:bg-rose-50 text-stone-800 border border-rose-200 shadow-sm transition flex items-center gap-1.5 font-medium">
+            <svg class="w-4 h-4 text-rose-800" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            <span>Back to Contents</span>
           </button>
-          <span class="text-slate-600">/</span>
-          <select id="lessonQuickSelect" aria-label="Jump to lesson" class="bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-cyan-500 max-w-xs sm:max-w-md"></select>
+          <span class="text-rose-300">/</span>
+          <select id="lessonQuickSelect" aria-label="Jump to lesson" class="bg-white border border-rose-200 text-stone-800 text-xs rounded-lg px-3 py-1.5 focus:outline-none focus:border-rose-700 shadow-sm max-w-xs sm:max-w-md font-medium"></select>
         </div>
 
         <div class="flex items-center gap-2">
-          <button id="markCompleteBtn" class="px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-200 transition flex items-center gap-1.5">
-            <span id="markCompleteIcon" class="w-3.5 h-3.5 rounded border border-slate-500 inline-flex items-center justify-center"></span>
+          <button id="markCompleteBtn" class="px-3 py-1.5 rounded-lg text-xs font-medium border border-rose-200 bg-white hover:bg-rose-50 text-stone-800 shadow-sm transition flex items-center gap-1.5">
+            <span id="markCompleteIcon" class="w-3.5 h-3.5 rounded border border-rose-400 inline-flex items-center justify-center"></span>
             <span id="markCompleteText">Mark Complete</span>
           </button>
-          <button id="prevLessonBtn" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition">← Prev</button>
-          <button id="nextLessonBtn" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition">Next →</button>
+          <button id="prevLessonBtn" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-white hover:bg-rose-50 text-stone-700 border border-rose-200 shadow-sm transition">← Prev</button>
+          <button id="nextLessonBtn" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-white hover:bg-rose-50 text-stone-700 border border-rose-200 shadow-sm transition">Next →</button>
         </div>
       </div>
 
       <!-- Lesson Title & Header -->
-      <div class="space-y-2.5">
+      <div class="space-y-2">
         <div class="flex flex-wrap items-center gap-2">
-          <span id="lessonChapterBadge" class="text-xs font-mono uppercase tracking-wider text-cyan-400">Chapter 1</span>
-          <span class="text-slate-600">•</span>
-          <span id="lessonStatusPill" class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+          <span id="lessonChapterBadge" class="text-xs font-semibold uppercase tracking-wider text-rose-800">Chapter 1</span>
+          <span class="text-rose-300">•</span>
+          <span id="lessonStatusPill" class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-100 text-rose-900 border border-rose-200">
             Interactive Simulation
           </span>
-          <span class="text-xs font-mono text-slate-500 hidden sm:inline" id="lessonFilePill"></span>
+          <span class="text-xs font-mono text-stone-400 hidden sm:inline" id="lessonFilePill"></span>
         </div>
-        <h1 id="lessonTitle" class="text-2xl sm:text-3xl font-bold text-white tracking-tight"></h1>
-        <p id="lessonSummary" class="text-sm sm:text-base text-slate-300 leading-relaxed"></p>
+        <h1 id="lessonTitle" class="heading-serif text-2xl sm:text-4xl font-bold text-stone-900 tracking-tight"></h1>
+        <p id="lessonSummary" class="text-sm sm:text-base text-stone-600 leading-relaxed"></p>
       </div>
 
-      <!-- Simulation Frame Container -->
-      <div class="rounded-2xl border border-slate-800 bg-slate-900/70 overflow-hidden shadow-2xl">
+      <!-- Simulation Frame Container with Zoom, Height Presets & Scroll Support -->
+      <div class="rounded-2xl border border-rose-200 bg-white overflow-hidden shadow-md">
         <!-- Frame Toolbar -->
-        <div class="px-4 py-2.5 bg-slate-900 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2">
+        <div class="px-4 py-2.5 bg-rose-50/80 border-b border-rose-200 flex flex-wrap items-center justify-between gap-2">
           <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
-            <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
-            <span id="frameTitleBar" class="ml-2 text-xs font-mono text-slate-300 truncate max-w-xs sm:max-w-md"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-400"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+            <span id="frameTitleBar" class="ml-2 text-xs font-mono text-stone-700 truncate max-w-[180px] sm:max-w-xs"></span>
           </div>
 
-          <div class="flex items-center gap-1.5">
-            <button id="modeIframeBtn" class="px-2.5 py-1 rounded text-xs font-medium bg-cyan-500 text-slate-950 font-semibold transition">
-              Interactive Simulation
+          <!-- Viewport Fit, Zoom & Height Controls for Large Illustrations -->
+          <div class="flex flex-wrap items-center gap-1.5">
+            <div id="iframeSizeControls" class="flex items-center gap-1 bg-white px-2 py-0.5 rounded-lg border border-rose-200 text-[11px] text-stone-600">
+              <span class="hidden sm:inline text-stone-400 mr-1">Fit:</span>
+              <button data-zoom="0.75" class="zoom-btn px-1.5 py-0.5 rounded hover:bg-rose-100">75%</button>
+              <button data-zoom="0.88" class="zoom-btn px-1.5 py-0.5 rounded hover:bg-rose-100">88%</button>
+              <button data-zoom="1" class="zoom-btn px-1.5 py-0.5 rounded bg-rose-800 text-white font-semibold">100%</button>
+              <span class="text-rose-200 mx-0.5">|</span>
+              <button id="toggleTallBoxBtn" class="px-1.5 py-0.5 rounded hover:bg-rose-100 text-rose-900 font-medium" title="Expand box height for tall illustrations">
+                Expand Height ↕
+              </button>
+            </div>
+
+            <button id="modeIframeBtn" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-rose-800 text-white transition">
+              Simulation
             </button>
-            <button id="modeSandboxBtn" class="px-2.5 py-1 rounded text-xs font-medium bg-slate-800 text-slate-300 hover:text-white transition">
+            <button id="modeSandboxBtn" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-white text-stone-700 hover:bg-rose-100 border border-rose-200 transition">
               Concept Explorer
             </button>
-            <a id="openStandaloneLink" href="#" target="_blank" rel="noopener" class="px-2.5 py-1 rounded text-xs font-medium bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 transition flex items-center gap-1">
-              <span>Full Screen</span>
+            <a id="openStandaloneLink" href="#" target="_blank" rel="noopener" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-white hover:bg-rose-100 text-rose-900 border border-rose-200 transition flex items-center gap-1">
+              <span>Full Tab</span>
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
             </a>
           </div>
         </div>
 
-        <!-- Mode A: External HTML Simulation Iframe -->
-        <div id="externalIframeContainer" class="relative bg-slate-950" style="min-height: 520px;">
-          <iframe id="simulationIframe" class="w-full h-[560px] border-0" title="SAR Interactive Simulation"></iframe>
+        <!-- Mode A: Scrollable, Auto-Resizing & Zoomable External HTML Simulation Iframe -->
+        <div id="externalIframeContainer" class="sim-viewport relative">
+          <div id="iframeScaleWrapper" class="sim-iframe-wrap">
+            <iframe id="simulationIframe" scrolling="yes" class="w-full h-full border-0 block" style="min-height: 800px; overflow: auto;" title="SAR Interactive Simulation"></iframe>
+          </div>
         </div>
 
         <!-- Mode B: Built-in Interactive Concept Explorer -->
-        <div id="builtinDemoContainer" class="hidden p-5 bg-slate-950 space-y-4">
+        <div id="builtinDemoContainer" class="hidden p-5 bg-[#FAF7F5] space-y-4">
           <div class="flex flex-col lg:flex-row gap-5 items-stretch">
-            <div class="flex-1 bg-slate-900 border border-slate-800 rounded-xl p-3 flex flex-col">
+            <div class="flex-1 bg-white border border-rose-200 rounded-xl p-3 flex flex-col shadow-sm">
               <div class="flex items-center justify-between mb-2">
-                <span id="demoCanvasTitle" class="text-xs font-mono uppercase tracking-wider text-cyan-400">Interactive Signal &amp; Phase Visualizer</span>
-                <span id="demoReadout" class="text-xs font-mono text-emerald-400"></span>
+                <span id="demoCanvasTitle" class="text-xs font-mono uppercase tracking-wider text-rose-800 font-semibold">Interactive Signal &amp; Phase Visualizer</span>
+                <span id="demoReadout" class="text-xs font-mono text-stone-700 font-medium"></span>
               </div>
-              <div class="relative flex-1 min-h-[280px] flex items-center justify-center">
-                <canvas id="interactiveCanvas" class="w-full h-[280px] rounded-lg bg-slate-950"></canvas>
+              <div class="relative flex-1 min-h-[300px] flex items-center justify-center">
+                <canvas id="interactiveCanvas" class="w-full h-[300px] rounded-lg bg-[#23191C]"></canvas>
               </div>
             </div>
 
             <!-- Interactive Sliders -->
-            <div class="w-full lg:w-72 bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between space-y-4">
+            <div class="w-full lg:w-72 bg-white border border-rose-200 rounded-xl p-4 flex flex-col justify-between space-y-4 shadow-sm">
               <div class="space-y-4">
-                <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-400">Model Parameters</h4>
+                <h4 class="text-xs font-semibold uppercase tracking-wider text-rose-900">Model Parameters</h4>
                 <div>
                   <div class="flex justify-between text-xs mb-1">
-                    <span id="slider1Label" class="text-slate-300">Parameter 1</span>
-                    <span id="slider1Val" class="font-mono text-cyan-400">50</span>
+                    <span id="slider1Label" class="text-stone-700 font-medium">Parameter 1</span>
+                    <span id="slider1Val" class="font-mono text-rose-800 font-semibold">50</span>
                   </div>
-                  <input id="slider1" type="range" min="1" max="100" value="50" class="w-full accent-cyan-400 cursor-pointer">
+                  <input id="slider1" type="range" min="1" max="100" value="50" class="w-full accent-rose-800 cursor-pointer">
                 </div>
                 <div>
                   <div class="flex justify-between text-xs mb-1">
-                    <span id="slider2Label" class="text-slate-300">Parameter 2</span>
-                    <span id="slider2Val" class="font-mono text-cyan-400">35</span>
+                    <span id="slider2Label" class="text-stone-700 font-medium">Parameter 2</span>
+                    <span id="slider2Val" class="font-mono text-rose-800 font-semibold">35</span>
                   </div>
-                  <input id="slider2" type="range" min="1" max="100" value="35" class="w-full accent-cyan-400 cursor-pointer">
+                  <input id="slider2" type="range" min="1" max="100" value="35" class="w-full accent-rose-800 cursor-pointer">
                 </div>
                 <div>
                   <div class="flex justify-between text-xs mb-1">
-                    <span id="slider3Label" class="text-slate-300">Noise / Decorrelation</span>
-                    <span id="slider3Val" class="font-mono text-cyan-400">15</span>
+                    <span id="slider3Label" class="text-stone-700 font-medium">Noise / Decorrelation</span>
+                    <span id="slider3Val" class="font-mono text-rose-800 font-semibold">15</span>
                   </div>
-                  <input id="slider3" type="range" min="0" max="100" value="15" class="w-full accent-cyan-400 cursor-pointer">
+                  <input id="slider3" type="range" min="0" max="100" value="15" class="w-full accent-rose-800 cursor-pointer">
                 </div>
               </div>
 
-              <div class="p-3 rounded-lg bg-slate-950 border border-slate-800/80 text-[11px] text-slate-400 leading-relaxed">
-                <strong class="text-slate-200 block mb-0.5">Interactive Exploration:</strong>
+              <div class="p-3 rounded-lg bg-rose-50/70 border border-rose-200/80 text-[11px] text-stone-600 leading-relaxed">
+                <strong class="text-rose-950 block mb-0.5">Interactive Exploration:</strong>
                 <span id="demoExplanationText">Adjust the sliders above to inspect how radar phase, coherence, and spatial resampling respond in real time.</span>
               </div>
             </div>
@@ -427,40 +402,40 @@
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Left 2 Columns: Theory & Guided Lab -->
         <div class="lg:col-span-2 space-y-6">
-          <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 sm:p-6 space-y-3">
-            <h3 class="text-base font-bold text-white flex items-center gap-2">
-              <span class="w-2 h-5 rounded bg-cyan-400"></span>
+          <div class="rounded-2xl bg-white border border-rose-200/80 p-5 sm:p-6 shadow-sm space-y-3">
+            <h3 class="heading-serif text-lg font-bold text-stone-900 flex items-center gap-2">
+              <span class="w-1.5 h-5 rounded bg-rose-800"></span>
               Physical Intuition &amp; Earth Observation Context
             </h3>
-            <p id="lessonTheoryText" class="text-sm text-slate-300 leading-relaxed"></p>
+            <p id="lessonTheoryText" class="text-sm text-stone-700 leading-relaxed"></p>
           </div>
 
-          <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 sm:p-6 space-y-4">
-            <h3 class="text-base font-bold text-white flex items-center gap-2">
-              <span class="w-2 h-5 rounded bg-emerald-400"></span>
+          <div class="rounded-2xl bg-white border border-rose-200/80 p-5 sm:p-6 shadow-sm space-y-4">
+            <h3 class="heading-serif text-lg font-bold text-stone-900 flex items-center gap-2">
+              <span class="w-1.5 h-5 rounded bg-rose-500"></span>
               Guided Interactive Exploration Tasks
             </h3>
-            <ul id="lessonExercisesList" class="space-y-2.5 text-sm text-slate-300"></ul>
+            <ul id="lessonExercisesList" class="space-y-2.5 text-sm text-stone-700"></ul>
           </div>
         </div>
 
         <!-- Right Column: Key Equation, Mission Tie-In & Quick Quiz -->
         <div class="space-y-6">
-          <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-3">
-            <h3 class="text-xs font-mono uppercase tracking-wider text-cyan-400">Governing Equation</h3>
-            <div id="lessonEquationBox" class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 font-mono text-xs sm:text-sm text-amber-300 overflow-x-auto"></div>
-            <p id="lessonEquationDesc" class="text-xs text-slate-400 leading-relaxed"></p>
+          <div class="rounded-2xl bg-white border border-rose-200/80 p-5 shadow-sm space-y-3">
+            <h3 class="text-xs font-mono uppercase tracking-wider text-rose-800 font-semibold">Governing Equation</h3>
+            <div id="lessonEquationBox" class="p-3.5 rounded-xl bg-rose-50/80 border border-rose-200 font-mono text-xs sm:text-sm text-rose-950 overflow-x-auto"></div>
+            <p id="lessonEquationDesc" class="text-xs text-stone-600 leading-relaxed"></p>
           </div>
 
-          <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-3">
-            <h3 class="text-xs font-mono uppercase tracking-wider text-indigo-400">Satellite Mission Benchmark</h3>
-            <p id="lessonMissionText" class="text-xs text-slate-300 leading-relaxed"></p>
+          <div class="rounded-2xl bg-white border border-rose-200/80 p-5 shadow-sm space-y-3">
+            <h3 class="text-xs font-mono uppercase tracking-wider text-rose-800 font-semibold">Satellite Mission Benchmark</h3>
+            <p id="lessonMissionText" class="text-xs text-stone-700 leading-relaxed"></p>
           </div>
 
           <!-- Self-Check Question -->
-          <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-5 space-y-3">
-            <h3 class="text-xs font-mono uppercase tracking-wider text-emerald-400">Concept Check</h3>
-            <p id="quizQuestion" class="text-xs font-medium text-white leading-relaxed"></p>
+          <div class="rounded-2xl bg-white border border-rose-200/80 p-5 shadow-sm space-y-3">
+            <h3 class="text-xs font-mono uppercase tracking-wider text-rose-800 font-semibold">Concept Check</h3>
+            <p id="quizQuestion" class="text-xs font-semibold text-stone-900 leading-relaxed"></p>
             <div id="quizOptions" class="space-y-2 pt-1"></div>
             <div id="quizFeedback" class="hidden text-xs p-2.5 rounded-lg border"></div>
           </div>
@@ -470,24 +445,87 @@
 
   </main>
 
-  <!-- Subtle Course Footer with Author Credit -->
-  <footer class="border-t border-slate-900 bg-slate-950/90 py-6 px-4 lg:px-8 mt-12">
-    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
-      <div class="flex items-center gap-2">
-        <span class="font-semibold text-slate-300">SAR<span class="text-cyan-400">EO</span></span>
-        <span>—</span>
-        <span>Synthetic Aperture Radar for Earth Observation</span>
+  <!-- Lightbox Modal for SAR Maps Gallery -->
+  <div id="mapLightboxModal" class="fixed inset-0 z-50 hidden bg-stone-950/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white border border-rose-200 rounded-2xl max-w-3xl w-full overflow-hidden shadow-2xl">
+      <div class="px-5 py-3.5 bg-rose-50 border-b border-rose-200 flex items-center justify-between">
+        <div>
+          <span id="lightboxBadge" class="text-[11px] font-mono uppercase text-rose-800 font-semibold"></span>
+          <h3 id="lightboxTitle" class="heading-serif text-lg font-bold text-stone-900"></h3>
+        </div>
+        <button id="closeLightboxBtn" class="p-1.5 rounded-lg text-stone-500 hover:text-stone-900 hover:bg-rose-100 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
       </div>
-      <div class="text-slate-400">
-        Created &amp; curated by <span class="text-slate-200 font-medium">Sharayu</span>
+      <div class="p-5 space-y-4">
+        <div id="lightboxVisual" class="w-full h-72 sm:h-80 rounded-xl overflow-hidden bg-stone-900 flex items-center justify-center relative"></div>
+        <p id="lightboxDesc" class="text-xs sm:text-sm text-stone-700 leading-relaxed"></p>
+        <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-rose-100 text-xs text-stone-500">
+          <span id="lightboxFileHint" class="font-mono text-rose-800"></span>
+          <span>SAR Map Showcase • By Sharayu</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subtle Course Footer with Author Credit -->
+  <footer class="border-t border-rose-200/80 bg-rose-50/50 py-6 px-4 lg:px-10 mt-14">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-stone-500">
+      <div class="flex items-center gap-2">
+        <span class="heading-serif font-bold text-stone-800 text-sm">SAR <span class="text-rose-800">Earth Observation</span></span>
+        <span>—</span>
+        <span>Interactive Microwave Remote Sensing &amp; InSAR Curriculum</span>
+      </div>
+      <div class="text-stone-600">
+        Created &amp; curated by <span class="text-rose-900 font-semibold">Sharayu</span>
       </div>
     </div>
   </footer>
 
   <!-- Toast Notification -->
-  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden px-4 py-2.5 rounded-xl bg-slate-900 border border-cyan-500/50 text-xs text-white shadow-xl"></div>
+  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden px-4 py-2.5 rounded-xl bg-stone-900 text-xs text-white shadow-xl"></div>
 
   <script>
+    // SAR Maps Showcase Data (Ready for Sharayu's custom map uploads in maps/ folder, with procedural fallback visuals)
+    const SAR_MAPS = [
+      {
+        id: 'map1',
+        category: 'insar',
+        badge: 'DInSAR Interferogram • Sentinel-1',
+        title: 'Co-Seismic Surface Displacement Fringes',
+        imgPath: 'maps/sar_map_1.png',
+        caption: 'Wrapped [-π, +π) interferometric phase fringes showing crustal deformation. Each rainbow color cycle represents 2.8 cm of Line-of-Sight surface motion.',
+        fallbackStyle: 'conic-gradient(from 45deg at 52% 48%, #f43f5e, #fbbf24, #10b981, #3b82f6, #a855f7, #f43f5e, #fbbf24, #10b981, #3b82f6, #f43f5e)'
+      },
+      {
+        id: 'map2',
+        category: 'rgb',
+        badge: 'Multi-Temporal SAR RGB • C-Band',
+        title: 'Flood Inundation &amp; Surface Change Map',
+        imgPath: 'maps/sar_map_2.png',
+        caption: 'Multi-temporal backscatter composite (Red = Pre-Flood σ⁰, Green/Blue = Co-Flood σ⁰). Specular water surfaces drop in radar return, highlighting flooded plains in vivid crimson.',
+        fallbackStyle: 'radial-gradient(circle at 35% 55%, #be123c 0%, #881337 28%, #1e293b 62%, #334155 100%)'
+      },
+      {
+        id: 'map3',
+        category: 'coherence',
+        badge: 'InSAR Phase Coherence (γ)',
+        title: 'Spatial Coherence &amp; Urban Stability Map',
+        imgPath: 'maps/sar_map_3.png',
+        caption: 'Interferometric coherence magnitude (0 ≤ |γ| ≤ 1). Bright zones indicate phase-stable urban infrastructure and bare rock; dark zones mark temporal decorrelation over water and dense vegetation.',
+        fallbackStyle: 'radial-gradient(ellipse at 60% 45%, #f8fafc 0%, #cbd5e1 30%, #475569 65%, #0f172a 100%)'
+      },
+      {
+        id: 'map4',
+        category: 'coherence',
+        badge: 'Dual/Quad-Pol Decomposition',
+        title: 'Vegetated &amp; Urban Scattering Mechanisms',
+        imgPath: 'maps/sar_map_4.png',
+        caption: 'Polarimetric SAR decomposition separating dihedral double-bounce urban structures (Red), depolarized forest canopy volume scattering (Green), and rough surface Bragg scattering (Blue).',
+        fallbackStyle: 'linear-gradient(135deg, #065f46 0%, #047857 38%, #9f1239 68%, #1d4ed8 100%)'
+      }
+    ];
+
     // Complete Curriculum Data
     const CHAPTERS = [
       {
@@ -750,7 +788,7 @@
             equationDesc: 'Decibel conversion and 2%–98% histogram clipping convert skewed radar intensities into balanced 8-bit RGB composites.',
             mission: 'Widely used by UN-SPIDER and Copernicus EMS for rapid Sentinel-1 flood mapping and agricultural monitoring.',
             exercises: [
-              'Assign pre-flood and post-flood backscatter layers to R, G, and B channels and identify inundated floodplains in cyan/red.',
+              'Assign pre-flood and post-flood backscatter layers to R, G, and B channels and identify inundated floodplains in crimson/red.',
               'Adjust the dB clipping bounds (-25 dB to 0 dB) to enhance contrast over water vs. forest.',
               'Test VV + VH + VV/VH false-color pseudo-polarimetric composites.'
             ],
@@ -1281,10 +1319,13 @@
     let currentView = 'overview';
     let currentLessonId = '1.2';
     let contentFilter = 'all';
+    let mapCategory = 'all';
     let searchQuery = '';
     let completedLessons = {};
     let currentSimMode = 'iframe';
     let activeSecondaryFile = false;
+    let currentZoom = 1;
+    let isTallBox = false;
 
     try {
       const saved = localStorage.getItem('sareo_completed_lessons');
@@ -1321,13 +1362,13 @@
       });
       document.querySelectorAll('.nav-tab').forEach(btn => {
         const isMatch = btn.getAttribute('data-nav') === viewName;
-        btn.className = 'nav-tab px-4 py-1.5 rounded-lg text-xs font-medium transition whitespace-nowrap ' +
-          (isMatch ? 'bg-cyan-500 text-slate-950 font-semibold' : 'text-slate-300 hover:text-white');
+        btn.className = 'nav-tab px-4 py-1.5 rounded-lg text-xs transition whitespace-nowrap ' +
+          (isMatch ? 'bg-rose-800 text-white font-semibold shadow-sm' : 'text-stone-700 hover:text-rose-900 font-medium');
       });
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // Populate Lesson Quick Select Dropdown in Lesson View
+    // Populate Lesson Quick Select Dropdown
     function populateLessonSelect() {
       const sel = document.getElementById('lessonQuickSelect');
       if (!sel) return;
@@ -1343,6 +1384,55 @@
         });
         sel.appendChild(grp);
       });
+    }
+
+    // Render SAR Maps Showcase Cards
+    function renderSarMaps() {
+      const grid = document.getElementById('sarMapsGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      const filtered = SAR_MAPS.filter(m => mapCategory === 'all' || m.category === mapCategory);
+
+      filtered.forEach(m => {
+        const card = document.createElement('div');
+        card.className = 'rounded-2xl bg-white border border-rose-200/90 overflow-hidden shadow-sm hover:shadow-md hover:border-rose-400 transition flex flex-col justify-between group cursor-pointer';
+
+        card.innerHTML = `
+          <div>
+            <div class="h-44 w-full relative overflow-hidden flex items-center justify-center" style="background: ${m.fallbackStyle};">
+              <img src="${m.imgPath}" alt="${m.title}" class="w-full h-full object-cover absolute inset-0" onerror="this.style.display='none'">
+              <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+              <span class="absolute bottom-2.5 left-3 text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-white/90 text-rose-950 font-semibold shadow-sm">
+                ${m.badge}
+              </span>
+            </div>
+            <div class="p-4 space-y-1.5">
+              <h3 class="heading-serif text-base font-bold text-stone-900 group-hover:text-rose-800 transition">${m.title}</h3>
+              <p class="text-xs text-stone-600 leading-relaxed line-clamp-3">${m.caption}</p>
+            </div>
+          </div>
+          <div class="px-4 py-2.5 bg-rose-50/60 border-t border-rose-100 flex items-center justify-between text-[11px] text-rose-900 font-medium">
+            <span>Inspect Map Details</span>
+            <span>→</span>
+          </div>
+        `;
+
+        card.addEventListener('click', () => openMapLightbox(m));
+        grid.appendChild(card);
+      });
+    }
+
+    function openMapLightbox(m) {
+      const modal = document.getElementById('mapLightboxModal');
+      document.getElementById('lightboxBadge').textContent = m.badge;
+      document.getElementById('lightboxTitle').innerHTML = m.title;
+      document.getElementById('lightboxDesc').textContent = m.caption;
+      document.getElementById('lightboxFileHint').textContent = 'Image slot: ' + m.imgPath;
+      const vis = document.getElementById('lightboxVisual');
+      vis.style.background = m.fallbackStyle;
+      vis.innerHTML = `<img src="${m.imgPath}" alt="${m.title}" class="w-full h-full object-contain relative z-10" onerror="this.style.display='none'">`;
+      modal.classList.remove('hidden');
     }
 
     // Render Course Contents Cards on Main Page
@@ -1363,28 +1453,28 @@
         if (filteredLessons.length === 0) return;
 
         const card = document.createElement('div');
-        card.className = 'rounded-2xl bg-slate-900/60 border border-slate-800 p-5 flex flex-col justify-between space-y-4 hover:border-slate-700 transition';
+        card.className = 'rounded-2xl bg-white border border-rose-200/80 p-5 flex flex-col justify-between space-y-4 shadow-sm hover:border-rose-300 transition';
 
         let lessonsHtml = '';
         filteredLessons.forEach(l => {
           const isDone = !!completedLessons[l.id];
           const badgeClass = isDone
-            ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+            ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
             : (l.status === 'have'
-                ? 'bg-cyan-500/10 text-cyan-300 border-cyan-500/30 group-hover:bg-cyan-500/20'
-                : 'bg-slate-800 text-slate-400 border-slate-700');
-          const tagText = isDone ? '✓ Done' : (l.status === 'have' ? 'Interactive Lab' : 'Concept Module');
+                ? 'bg-rose-100/80 text-rose-900 border-rose-200 group-hover:bg-rose-800 group-hover:text-white'
+                : 'bg-stone-100 text-stone-600 border-stone-200');
+          const tagText = isDone ? '✓ Done' : (l.status === 'have' ? 'Interactive' : 'Concept');
 
           lessonsHtml += `
-            <button data-lesson-id="${l.id}" class="mindmap-node w-full text-left p-3 rounded-xl bg-slate-950/80 hover:bg-slate-950 border border-slate-800/90 hover:border-cyan-500/50 transition group flex items-start justify-between gap-2.5">
+            <button data-lesson-id="${l.id}" class="mindmap-node w-full text-left p-3 rounded-xl bg-[#FAF7F5] hover:bg-rose-50/70 border border-rose-200/60 hover:border-rose-400 transition group flex items-start justify-between gap-2.5">
               <div class="min-w-0">
                 <div class="flex items-center gap-2">
-                  <span class="text-[11px] font-mono text-cyan-400 font-semibold">${l.id}</span>
-                  <span class="text-xs font-medium text-slate-200 group-hover:text-white leading-snug">${l.title}</span>
+                  <span class="text-[11px] font-mono text-rose-800 font-semibold">${l.id}</span>
+                  <span class="text-xs font-semibold text-stone-800 group-hover:text-rose-950 leading-snug">${l.title}</span>
                 </div>
-                <p class="text-[11px] text-slate-400 line-clamp-1 mt-1">${l.summary}</p>
+                <p class="text-[11px] text-stone-500 line-clamp-1 mt-1">${l.summary}</p>
               </div>
-              <span class="shrink-0 text-[10px] font-mono px-2 py-0.5 rounded-md border ${badgeClass}">${tagText}</span>
+              <span class="shrink-0 text-[10px] font-mono px-2 py-0.5 rounded-md border transition ${badgeClass}">${tagText}</span>
             </button>
           `;
         });
@@ -1392,12 +1482,12 @@
         card.innerHTML = `
           <div class="space-y-3">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-mono uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">${ch.number}</span>
-              <span class="text-xs font-mono text-slate-400">${filteredLessons.length} Lessons</span>
+              <span class="text-xs font-mono uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-rose-100/80 text-rose-900 border border-rose-200 font-semibold">${ch.number}</span>
+              <span class="text-xs font-mono text-stone-500">${filteredLessons.length} Lessons</span>
             </div>
             <div>
-              <h3 class="text-base font-bold text-white">${ch.title}</h3>
-              <p class="text-xs text-slate-400 mt-0.5">${ch.subtitle}</p>
+              <h3 class="heading-serif text-lg font-bold text-stone-900">${ch.title}</h3>
+              <p class="text-xs text-stone-500 mt-0.5">${ch.subtitle}</p>
             </div>
             <div class="space-y-2 pt-1">
               ${lessonsHtml}
@@ -1411,6 +1501,24 @@
         btn.addEventListener('click', () => {
           openLesson(btn.getAttribute('data-lesson-id'));
         });
+      });
+    }
+
+    // Apply Zoom / Fit scaling to the iframe so wide or tall illustrations fit cleanly and remain scrollable
+    function applyIframeZoom(zoomFactor) {
+      currentZoom = zoomFactor;
+      const wrap = document.getElementById('iframeScaleWrapper');
+      const iframe = document.getElementById('simulationIframe');
+      if (wrap && iframe) {
+        wrap.style.transform = `scale(${zoomFactor})`;
+        wrap.style.width = `${(100 / zoomFactor).toFixed(2)}%`;
+        wrap.style.height = `${(100 / zoomFactor).toFixed(2)}%`;
+      }
+      document.querySelectorAll('.zoom-btn').forEach(btn => {
+        const z = parseFloat(btn.getAttribute('data-zoom'));
+        const active = Math.abs(z - zoomFactor) < 0.01;
+        btn.className = 'zoom-btn px-1.5 py-0.5 rounded ' +
+          (active ? 'bg-rose-800 text-white font-semibold' : 'hover:bg-rose-100 text-stone-600');
       });
     }
 
@@ -1435,10 +1543,10 @@
       // Status Pill
       const statusPill = document.getElementById('lessonStatusPill');
       if (lesson.status === 'have') {
-        statusPill.className = 'px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-300 border border-emerald-500/30';
+        statusPill.className = 'px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-100 text-rose-900 border border-rose-200';
         statusPill.textContent = 'Interactive Simulation';
       } else {
-        statusPill.className = 'px-2.5 py-0.5 rounded-full text-xs font-medium bg-cyan-500/15 text-cyan-300 border border-cyan-500/30';
+        statusPill.className = 'px-2.5 py-0.5 rounded-full text-xs font-medium bg-stone-200 text-stone-800 border border-stone-300';
         statusPill.textContent = 'Interactive Concept Explorer';
       }
 
@@ -1449,9 +1557,9 @@
       exList.innerHTML = '';
       lesson.exercises.forEach((ex, i) => {
         const li = document.createElement('li');
-        li.className = 'flex items-start gap-2.5 p-3 rounded-xl bg-slate-950/70 border border-slate-800/80';
+        li.className = 'flex items-start gap-2.5 p-3 rounded-xl bg-[#FAF7F5] border border-rose-200/70';
         li.innerHTML = `
-          <span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono text-xs flex items-center justify-center shrink-0 mt-0.5">${i + 1}</span>
+          <span class="w-5 h-5 rounded-full bg-rose-800 text-white font-mono text-xs flex items-center justify-center shrink-0 mt-0.5">${i + 1}</span>
           <span>${ex}</span>
         `;
         exList.appendChild(li);
@@ -1460,10 +1568,10 @@
       // If Lesson 3.6 has two HTML files (Spectral Diversity + Sentinel-1 ESD), add a toggle button
       if (lesson.secondaryFile) {
         const toggleDiv = document.createElement('li');
-        toggleDiv.className = 'p-3 rounded-xl bg-cyan-950/30 border border-cyan-500/30 flex items-center justify-between gap-2';
+        toggleDiv.className = 'p-3 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-between gap-2';
         toggleDiv.innerHTML = `
-          <span class="text-xs text-cyan-200"><strong>Two Interactive Simulations Available:</strong> Switch between Spectral Diversity and Sentinel-1 Enhanced Spectral Diversity (ESD).</span>
-          <button id="toggleSecondaryFileBtn" class="px-3 py-1 rounded-lg bg-cyan-500 text-slate-950 font-semibold text-xs shrink-0">Switch Simulation</button>
+          <span class="text-xs text-rose-950"><strong>Two Interactive Simulations Available:</strong> Switch between Spectral Diversity and Sentinel-1 Enhanced Spectral Diversity (ESD).</span>
+          <button id="toggleSecondaryFileBtn" class="px-3 py-1 rounded-lg bg-rose-800 text-white font-semibold text-xs shrink-0">Switch Simulation</button>
         `;
         exList.prepend(toggleDiv);
         setTimeout(() => {
@@ -1487,19 +1595,19 @@
 
       lesson.quiz.options.forEach((opt, idx) => {
         const b = document.createElement('button');
-        b.className = 'w-full text-left p-2.5 rounded-xl bg-slate-950 hover:bg-slate-900 border border-slate-800 text-xs text-slate-300 transition';
+        b.className = 'w-full text-left p-2.5 rounded-xl bg-[#FAF7F5] hover:bg-rose-50 border border-rose-200/80 text-xs text-stone-800 transition';
         b.textContent = opt;
         b.addEventListener('click', () => {
           qFeed.classList.remove('hidden');
           if (idx === lesson.quiz.answer) {
-            qFeed.className = 'text-xs p-2.5 rounded-lg border bg-emerald-500/15 border-emerald-500/40 text-emerald-300';
+            qFeed.className = 'text-xs p-2.5 rounded-lg border bg-emerald-50 border-emerald-300 text-emerald-900 font-medium';
             qFeed.textContent = '✓ Correct! Great physical intuition.';
             completedLessons[lesson.id] = true;
             saveProgress();
             updateCompleteBtnUI();
             renderMindMap();
           } else {
-            qFeed.className = 'text-xs p-2.5 rounded-lg border bg-rose-500/15 border-rose-500/40 text-rose-300';
+            qFeed.className = 'text-xs p-2.5 rounded-lg border bg-rose-50 border-rose-300 text-rose-900 font-medium';
             qFeed.textContent = 'Not quite — check the governing equation and try again.';
           }
         });
@@ -1518,7 +1626,6 @@
       updateCompleteBtnUI();
       setupInteractiveDemo(lesson);
 
-      // Default to external simulation iframe for the 20 existing HTML files, and built-in explorer for the 8 concept modules
       if (lesson.status === 'have') {
         setSimMode('iframe');
       } else {
@@ -1528,14 +1635,15 @@
 
     function updateSimulationFileBinding(lesson) {
       const targetFile = (activeSecondaryFile && lesson.secondaryFile) ? lesson.secondaryFile : lesson.file;
-      const relativeUrl = 'simulations/' + encodeURIComponent(targetFile).replace(/%20/g, ' ');
       const encodedHref = 'simulations/' + encodeURIComponent(targetFile);
 
       document.getElementById('lessonFilePill').textContent = targetFile;
       document.getElementById('frameTitleBar').textContent = lesson.title;
       document.getElementById('openStandaloneLink').setAttribute('href', encodedHref);
       const iframe = document.getElementById('simulationIframe');
-      if (iframe) iframe.setAttribute('src', encodedHref);
+      if (iframe) {
+        iframe.setAttribute('src', encodedHref);
+      }
     }
 
     function updateCompleteBtnUI() {
@@ -1543,11 +1651,11 @@
       const icon = document.getElementById('markCompleteIcon');
       const txt = document.getElementById('markCompleteText');
       if (isDone) {
-        icon.className = 'w-3.5 h-3.5 rounded bg-emerald-400 text-slate-950 inline-flex items-center justify-center font-bold text-[10px]';
+        icon.className = 'w-3.5 h-3.5 rounded bg-emerald-600 text-white inline-flex items-center justify-center font-bold text-[10px]';
         icon.textContent = '✓';
         txt.textContent = 'Completed';
       } else {
-        icon.className = 'w-3.5 h-3.5 rounded border border-slate-500 inline-flex items-center justify-center';
+        icon.className = 'w-3.5 h-3.5 rounded border border-rose-400 inline-flex items-center justify-center';
         icon.textContent = '';
         txt.textContent = 'Mark Complete';
       }
@@ -1557,19 +1665,22 @@
       currentSimMode = mode;
       const extBox = document.getElementById('externalIframeContainer');
       const demoBox = document.getElementById('builtinDemoContainer');
+      const sizeControls = document.getElementById('iframeSizeControls');
       const btnIframe = document.getElementById('modeIframeBtn');
       const btnSandbox = document.getElementById('modeSandboxBtn');
 
       if (mode === 'iframe') {
         extBox.classList.remove('hidden');
         demoBox.classList.add('hidden');
-        btnIframe.className = 'px-2.5 py-1 rounded text-xs font-medium bg-cyan-500 text-slate-950 font-semibold transition';
-        btnSandbox.className = 'px-2.5 py-1 rounded text-xs font-medium bg-slate-800 text-slate-300 hover:text-white transition';
+        if (sizeControls) sizeControls.classList.remove('hidden');
+        btnIframe.className = 'px-2.5 py-1 rounded-lg text-xs font-semibold bg-rose-800 text-white transition';
+        btnSandbox.className = 'px-2.5 py-1 rounded-lg text-xs font-medium bg-white text-stone-700 hover:bg-rose-100 border border-rose-200 transition';
       } else {
         extBox.classList.add('hidden');
         demoBox.classList.remove('hidden');
-        btnSandbox.className = 'px-2.5 py-1 rounded text-xs font-medium bg-cyan-500 text-slate-950 font-semibold transition';
-        btnIframe.className = 'px-2.5 py-1 rounded text-xs font-medium bg-slate-800 text-slate-300 hover:text-white transition';
+        if (sizeControls) sizeControls.classList.add('hidden');
+        btnSandbox.className = 'px-2.5 py-1 rounded-lg text-xs font-semibold bg-rose-800 text-white transition';
+        btnIframe.className = 'px-2.5 py-1 rounded-lg text-xs font-medium bg-white text-stone-700 hover:bg-rose-100 border border-rose-200 transition';
         drawInteractiveCanvas();
       }
     }
@@ -1623,7 +1734,7 @@
       if (!canvas) return;
       const rect = canvas.parentElement.getBoundingClientRect();
       canvas.width = Math.max(320, rect.width - 8);
-      canvas.height = 280;
+      canvas.height = 300;
       const ctx = canvas.getContext('2d');
       const w = canvas.width;
       const h = canvas.height;
@@ -1637,8 +1748,8 @@
 
       ctx.clearRect(0, 0, w, h);
 
-      // Subtle background grid
-      ctx.strokeStyle = 'rgba(51, 65, 85, 0.35)';
+      // Subtle grid
+      ctx.strokeStyle = 'rgba(244, 224, 228, 0.12)';
       ctx.lineWidth = 1;
       for (let x = 0; x < w; x += 32) {
         ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
@@ -1655,7 +1766,7 @@
         const taper = v2 / 100;
         const steer = ((v3 - 50) / 50) * 80;
         ctx.beginPath();
-        ctx.strokeStyle = '#22d3ee';
+        ctx.strokeStyle = '#fb7185';
         ctx.lineWidth = 2.5;
         for (let x = 0; x < w; x++) {
           const u = (x - w / 2 - steer) * freq;
@@ -1667,7 +1778,7 @@
         }
         ctx.stroke();
 
-        ctx.strokeStyle = 'rgba(148, 163, 184, 0.4)';
+        ctx.strokeStyle = 'rgba(251, 113, 133, 0.35)';
         ctx.beginPath(); ctx.moveTo(0, h * 0.68); ctx.lineTo(w, h * 0.68); ctx.stroke();
         readout.textContent = `Main-lobe width ∝ ${(100 / Math.max(10, v1)).toFixed(2)}° | Sidelobe suppression: -${(13 + v2 * 0.25).toFixed(1)} dB`;
       } else if (type === 'fringes' || type === 'tops') {
@@ -1675,31 +1786,31 @@
         const def = (v2 / 100) * 6;
         const noise = (v3 / 100) * 1.8;
 
-        const stripH = 110;
+        const stripH = 115;
         for (let x = 0; x < w; x += 3) {
           const r = (x - w / 2) / (w / 2);
           const rawPhase = (x * rate) + def * Math.exp(-r * r * 4) + (Math.sin(x * 1.7) * noise);
           const wrapped = ((rawPhase + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
           const hue = ((wrapped + Math.PI) / (2 * Math.PI)) * 360;
-          ctx.fillStyle = `hsl(${hue}, 85%, 55%)`;
+          ctx.fillStyle = `hsl(${hue}, 82%, 58%)`;
           ctx.fillRect(x, 24, 3, stripH);
         }
 
         ctx.beginPath();
-        ctx.strokeStyle = '#34d399';
+        ctx.strokeStyle = '#fda4af';
         ctx.lineWidth = 2;
         for (let x = 0; x < w; x++) {
           const r = (x - w / 2) / (w / 2);
           const rawPhase = (x * rate) + def * Math.exp(-r * r * 4);
           const wrapped = ((rawPhase + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
-          const py = 210 - (wrapped / Math.PI) * 45;
+          const py = 220 - (wrapped / Math.PI) * 45;
           if (x === 0) ctx.moveTo(x, py); else ctx.lineTo(x, py);
         }
         ctx.stroke();
         readout.textContent = `Wrapped [-π, +π) Fringe Cycles: ${(w * rate / (2 * Math.PI)).toFixed(1)} | Coherence γ ≈ ${(1 - v3 / 120).toFixed(2)}`;
       } else if (type === 'phase' || type === 'vector') {
         const cx = 110, cy = h / 2, rad = 75;
-        ctx.strokeStyle = '#475569';
+        ctx.strokeStyle = '#881337';
         ctx.lineWidth = 1.5;
         ctx.beginPath(); ctx.arc(cx, cy, rad, 0, Math.PI * 2); ctx.stroke();
 
@@ -1707,14 +1818,14 @@
         const px = cx + rad * Math.cos(angle);
         const py = cy + rad * Math.sin(angle);
 
-        ctx.strokeStyle = '#22d3ee';
+        ctx.strokeStyle = '#fb7185';
         ctx.lineWidth = 3;
         ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(px, py); ctx.stroke();
-        ctx.fillStyle = '#34d399';
+        ctx.fillStyle = '#fecdd3';
         ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI * 2); ctx.fill();
 
         ctx.beginPath();
-        ctx.strokeStyle = '#38bdf8';
+        ctx.strokeStyle = '#f43f5e';
         ctx.lineWidth = 2;
         for (let x = 220; x < w - 15; x++) {
           const t = (x - 220) * 0.06 + angle;
@@ -1727,13 +1838,13 @@
         const cx = w / 2 + ((v1 - 50) * 1.2);
         const cy = h / 2 + ((v2 - 50) * 0.8);
         for (let r = 90; r > 8; r -= 14) {
-          ctx.strokeStyle = `hsla(${190 - r}, 85%, 60%, ${0.9 - r / 120})`;
+          ctx.strokeStyle = `hsla(${345 - r * 0.4}, 85%, 65%, ${0.9 - r / 120})`;
           ctx.lineWidth = 2;
           ctx.beginPath();
           ctx.arc(cx, cy, r * (1 + v3 / 250), 0, Math.PI * 2);
           ctx.stroke();
         }
-        ctx.fillStyle = '#10b981';
+        ctx.fillStyle = '#fecdd3';
         ctx.beginPath(); ctx.arc(cx, cy, 5, 0, Math.PI * 2); ctx.fill();
         readout.textContent = `Sub-pixel offset: (${((v1 - 50) / 50).toFixed(3)}, ${((v2 - 50) / 50).toFixed(3)}) px | SNR: ${(25 - v3 * 0.18).toFixed(1)} dB`;
       }
@@ -1743,7 +1854,45 @@
     window.addEventListener('DOMContentLoaded', () => {
       populateLessonSelect();
       renderMindMap();
+      renderSarMaps();
       updateProgressUI();
+
+      // Auto-expand iframe height on same-origin load (works on GitHub Pages so tall illustrations never get clipped!)
+      const iframe = document.getElementById('simulationIframe');
+      if (iframe) {
+        iframe.addEventListener('load', () => {
+          try {
+            const doc = iframe.contentDocument || iframe.contentWindow.document;
+            if (doc && doc.body) {
+              // Ensure the inner HTML document allows scrolling even if it had overflow:hidden
+              doc.documentElement.style.overflow = 'auto';
+              doc.body.style.overflow = 'auto';
+              const h = Math.max(doc.body.scrollHeight, doc.documentElement.scrollHeight, 800);
+              const container = document.getElementById('externalIframeContainer');
+              if (container && !isTallBox) {
+                container.style.height = Math.min(Math.max(h + 32, 780), 1350) + 'px';
+              }
+            }
+          } catch (e) {}
+        });
+      }
+
+      // Zoom buttons for fitting wide/tall illustrations inside the box
+      document.querySelectorAll('.zoom-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          applyIframeZoom(parseFloat(btn.getAttribute('data-zoom')));
+        });
+      });
+
+      // Expand Height toggle button
+      document.getElementById('toggleTallBoxBtn').addEventListener('click', (e) => {
+        isTallBox = !isTallBox;
+        const container = document.getElementById('externalIframeContainer');
+        if (container) {
+          container.style.height = isTallBox ? '1250px' : '820px';
+        }
+        e.currentTarget.textContent = isTallBox ? 'Standard Height ↕' : 'Expand Height ↕';
+      });
 
       // Top nav tabs
       document.querySelectorAll('.nav-tab').forEach(btn => {
@@ -1759,7 +1908,7 @@
         switchView('overview');
       });
 
-      document.getElementById('startFirstLessonBtn').addEventListener('click', () => openLesson('1.2'));
+      document.getElementById('startFirstLessonBtn').addEventListener('click', () => openLesson('1.1'));
       document.getElementById('backToMapBtn').addEventListener('click', () => switchView('overview'));
 
       document.getElementById('lessonQuickSelect').addEventListener('change', (e) => {
@@ -1772,11 +1921,34 @@
           contentFilter = btn.getAttribute('data-filter');
           document.querySelectorAll('.filter-chip').forEach(c => {
             const active = c.getAttribute('data-filter') === contentFilter;
-            c.className = 'filter-chip px-2.5 py-1 rounded-lg text-[11px] font-medium ' +
-              (active ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40' : 'text-slate-400 hover:text-slate-200 border border-transparent');
+            c.className = 'filter-chip px-3 py-1 rounded-lg text-[11px] ' +
+              (active ? 'font-semibold bg-rose-800 text-white shadow-sm' : 'font-medium text-stone-700 hover:text-rose-900');
           });
           renderMindMap();
         });
+      });
+
+      // Map Category Filter Buttons
+      document.querySelectorAll('.map-cat-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          mapCategory = btn.getAttribute('data-map-cat');
+          document.querySelectorAll('.map-cat-btn').forEach(c => {
+            const active = c.getAttribute('data-map-cat') === mapCategory;
+            c.className = 'map-cat-btn px-3 py-1 rounded-lg text-xs ' +
+              (active ? 'font-semibold bg-rose-800 text-white shadow-sm' : 'font-medium text-stone-700 hover:text-rose-900');
+          });
+          renderSarMaps();
+        });
+      });
+
+      // Lightbox close
+      document.getElementById('closeLightboxBtn').addEventListener('click', () => {
+        document.getElementById('mapLightboxModal').classList.add('hidden');
+      });
+      document.getElementById('mapLightboxModal').addEventListener('click', (e) => {
+        if (e.target.id === 'mapLightboxModal') {
+          document.getElementById('mapLightboxModal').classList.add('hidden');
+        }
       });
 
       // Search input on Contents grid
