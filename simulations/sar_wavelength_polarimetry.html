@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>6.1 Radar Wavelength Penetration & Polarimetric Scattering</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #FAF7F5; color: #291D20; }
+    .heading-serif { font-family: 'Playfair Display', 'Times New Roman', serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    input[type="range"] { accent-color: #9F1239; }
+  </style>
+</head>
+<body class="p-4 sm:p-6 min-h-screen flex flex-col gap-5">
+
+  <header class="border-b border-rose-200 pb-3 flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <span class="text-[11px] font-mono uppercase tracking-widest text-rose-800 font-semibold">Lesson 6.1 • Interactive Lab</span>
+      <h1 class="heading-serif text-xl sm:text-2xl font-bold text-stone-900">Radar Wavelength Penetration (X, C, L, P) &amp; PolSAR Scattering</h1>
+    </div>
+    <div id="bandBadge" class="px-3 py-1 rounded-full text-xs font-semibold bg-rose-800 text-white">
+      Active Band: L-Band (λ = 24 cm • NISAR / ALOS-2)
+    </div>
+  </header>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+    <div class="lg:col-span-2 bg-white rounded-2xl border border-rose-200 p-4 shadow-sm space-y-3">
+      <div class="flex items-center justify-between text-xs text-stone-600">
+        <span class="font-semibold text-stone-800">Forest Canopy &amp; Soil Penetration + Pauli Polarimetric RGB</span>
+        <span id="polReadout" class="mono text-rose-900 font-medium"></span>
+      </div>
+      <div class="relative w-full h-[360px] bg-[#1E1618] rounded-xl overflow-hidden">
+        <canvas id="polCanvas" class="w-full h-full block"></canvas>
+      </div>
+      <div class="grid grid-cols-3 gap-2 pt-1 text-center text-xs">
+        <div class="p-2 rounded-lg bg-rose-50 border border-rose-200">
+          <div class="text-stone-500 text-[11px]">Surface Bragg (|HH+VV|)</div>
+          <div id="surfOut" class="mono font-bold text-sky-800 text-sm mt-0.5">25% (Blue)</div>
+        </div>
+        <div class="p-2 rounded-lg bg-rose-50 border border-rose-200">
+          <div class="text-stone-500 text-[11px]">Double-Bounce (|HH-VV|)</div>
+          <div id="dblOut" class="mono font-bold text-rose-800 text-sm mt-0.5">45% (Red)</div>
+        </div>
+        <div class="p-2 rounded-lg bg-rose-50 border border-rose-200">
+          <div class="text-stone-500 text-[11px]">Volume Canopy (2|HV|)</div>
+          <div id="volOut" class="mono font-bold text-emerald-800 text-sm mt-0.5">30% (Green)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-rose-200 p-5 shadow-sm flex flex-col justify-between space-y-4">
+      <div class="space-y-4">
+        <h2 class="heading-serif text-base font-bold text-stone-900 border-b border-rose-100 pb-2">Band &amp; Target Controls</h2>
+        <div>
+          <span class="text-xs font-medium text-stone-700 block mb-1.5">Select Radar Frequency Band</span>
+          <div class="grid grid-cols-4 gap-1.5">
+            <button data-band="X" class="band-btn py-1.5 rounded-lg text-xs font-medium bg-rose-50 text-rose-900 border border-rose-200">X (3cm)</button>
+            <button data-band="C" class="band-btn py-1.5 rounded-lg text-xs font-medium bg-rose-50 text-rose-900 border border-rose-200">C (5.6cm)</button>
+            <button data-band="L" class="band-btn py-1.5 rounded-lg text-xs font-semibold bg-rose-800 text-white">L (24cm)</button>
+            <button data-band="P" class="band-btn py-1.5 rounded-lg text-xs font-medium bg-rose-50 text-rose-900 border border-rose-200">P (70cm)</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="font-medium text-stone-700">Canopy Biomass Density</span>
+            <span id="bioVal" class="mono text-rose-800 font-semibold">65%</span>
+          </div>
+          <input id="bioSlider" type="range" min="0" max="100" value="65" class="w-full">
+        </div>
+
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="font-medium text-stone-700">Soil Moisture / Flooded Floor</span>
+            <span id="moistVal" class="mono text-rose-800 font-semibold">55%</span>
+          </div>
+          <input id="moistSlider" type="range" min="10" max="100" value="55" class="w-full">
+        </div>
+      </div>
+
+      <div id="bandDescBox" class="p-3.5 rounded-xl bg-rose-50/70 border border-rose-200 text-xs text-stone-700 leading-relaxed">
+        <strong>L-Band (24 cm):</strong> Penetrates past small leaves and twigs to interact with primary branches, tree trunks, and the ground—producing strong trunk-ground dihedral double-bounce (Red) and high InSAR coherence.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('polCanvas');
+    const ctx = canvas.getContext('2d');
+    let currentBand = 'L';
+
+    const BAND_INFO = {
+      X: { name: 'X-Band (λ = 3.1 cm • TerraSAR-X / COSMO)', pen: 0.18, desc: '<strong>X-Band (3.1 cm):</strong> Attenuates in the very top leaf layer of forest canopies. Ideal for high-resolution urban structures, roads, and bare surfaces.' },
+      C: { name: 'C-Band (λ = 5.6 cm • Sentinel-1 / EOS-04)', pen: 0.38, desc: '<strong>C-Band (5.6 cm):</strong> Scatters from upper leaves and small branches. Sensitive to agricultural crop structure, sea ice, and ocean wind roughness.' },
+      L: { name: 'L-Band (λ = 24 cm • NISAR / ALOS-2)', pen: 0.78, desc: '<strong>L-Band (24 cm):</strong> Penetrates through foliage to reach tree trunks and the ground surface, enabling forest biomass mapping and vegetated InSAR.' },
+      P: { name: 'P-Band (λ = 70 cm • ESA BIOMASS)', pen: 0.96, desc: '<strong>P-Band (70 cm):</strong> Pierces completely through dense tropical rainforest canopies to the ground floor and sub-surface dry sand.' }
+    };
+
+    function drawPol() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = Math.max(400, rect.width);
+      canvas.height = 360;
+      const w = canvas.width, h = canvas.height;
+
+      const bio = parseFloat(document.getElementById('bioSlider').value) / 100;
+      const moist = parseFloat(document.getElementById('moistSlider').value) / 100;
+      document.getElementById('bioVal').textContent = Math.round(bio * 100) + '%';
+      document.getElementById('moistVal').textContent = Math.round(moist * 100) + '%';
+
+      const bInfo = BAND_INFO[currentBand];
+      const pen = bInfo.pen * (1 - bio * 0.35);
+
+      // Compute Pauli percentages
+      const vol = Math.min(0.85, bio * (1.1 - bInfo.pen * 0.45));
+      const dbl = Math.min(0.85, pen * bio * (0.4 + moist * 0.7));
+      const surf = Math.max(0.1, (1 - bio * 0.6) * moist + pen * 0.25);
+      const sum = vol + dbl + surf;
+      const pVol = Math.round((vol / sum) * 100);
+      const pDbl = Math.round((dbl / sum) * 100);
+      const pSurf = Math.max(0, 100 - pVol - pDbl);
+
+      document.getElementById('surfOut').textContent = pSurf + '% (Blue)';
+      document.getElementById('dblOut').textContent = pDbl + '% (Red)';
+      document.getElementById('volOut').textContent = pVol + '% (Green)';
+      document.getElementById('polReadout').textContent = `Canopy Penetration Depth ≈ ${Math.round(pen * 100)}% of Stand Height`;
+
+      ctx.clearRect(0, 0, w, h);
+
+      const groundY = h - 48;
+
+      // Draw soil layer
+      ctx.fillStyle = `rgb(${55 - moist * 25}, ${42 - moist * 15}, ${38 + moist * 30})`;
+      ctx.fillRect(20, groundY, w - 40, 32);
+      ctx.font = '600 11px JetBrains Mono';
+      ctx.fillStyle = '#BAE6FD';
+      ctx.fillText('GROUND / SOIL LAYER (Dielectric ε_r ∝ Soil Moisture)', 32, groundY + 20);
+
+      // Draw trees across scene
+      const numTrees = 5;
+      const crownTopY = 85;
+      for (let i = 0; i < numTrees; i++) {
+        const tx = 85 + i * ((w - 240) / (numTrees - 1));
+        // Trunk
+        ctx.fillStyle = '#78350F';
+        ctx.fillRect(tx - 6, crownTopY + 60, 12, groundY - (crownTopY + 60));
+        // Canopy crown
+        ctx.fillStyle = `rgba(16, 185, 129, ${0.2 + bio * 0.55})`;
+        ctx.beginPath();
+        ctx.arc(tx, crownTopY + 45, 38 + (i % 2) * 8, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Draw Radar Rays penetrating to depth determined by band
+      const stopY = crownTopY + 15 + pen * (groundY - crownTopY - 18);
+      for (let r = 0; r < 4; r++) {
+        const rx = 95 + r * 75;
+        ctx.strokeStyle = '#FB7185';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(rx - 45, 22);
+        ctx.lineTo(rx, stopY);
+        ctx.stroke();
+
+        // Scattered wave indicator
+        ctx.fillStyle = pen > 0.65 ? '#F43F5E' : '#34D399';
+        ctx.beginPath();
+        ctx.arc(rx, stopY, 6, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Pauli RGB Swatch Box on Right
+      const swX = w - 145, swY = 35, swW = 120, swH = 120;
+      const rCol = Math.min(255, Math.round(pDbl * 3.8));
+      const gCol = Math.min(255, Math.round(pVol * 3.8));
+      const bCol = Math.min(255, Math.round(pSurf * 3.8));
+      ctx.fillStyle = `rgb(${rCol}, ${gCol}, ${bCol})`;
+      ctx.fillRect(swX, swY, swW, swH);
+      ctx.strokeStyle = '#FFF';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(swX, swY, swW, swH);
+      ctx.fillStyle = '#FFF';
+      ctx.fillText('Pauli RGB Pixel', swX + 12, swY + swH + 18);
+    }
+
+    document.querySelectorAll('.band-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentBand = btn.getAttribute('data-band');
+        document.querySelectorAll('.band-btn').forEach(b => {
+          const act = b.getAttribute('data-band') === currentBand;
+          b.className = 'band-btn py-1.5 rounded-lg text-xs ' +
+            (act ? 'font-semibold bg-rose-800 text-white' : 'font-medium bg-rose-50 text-rose-900 border border-rose-200');
+        });
+        document.getElementById('bandBadge').textContent = 'Active Band: ' + BAND_INFO[currentBand].name;
+        document.getElementById('bandDescBox').innerHTML = BAND_INFO[currentBand].desc;
+        drawPol();
+      });
+    });
+
+    ['bioSlider', 'moistSlider'].forEach(id => {
+      document.getElementById(id).addEventListener('input', drawPol);
+    });
+    window.addEventListener('resize', drawPol);
+    drawPol();
+  </script>
+</body>
+</html>

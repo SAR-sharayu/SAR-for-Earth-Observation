@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1.1 Side-Looking Radar Geometry & Terrain Distortions</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #FAF7F5; color: #291D20; }
+    .heading-serif { font-family: 'Playfair Display', 'Times New Roman', serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    input[type="range"] { accent-color: #9F1239; }
+  </style>
+</head>
+<body class="p-4 sm:p-6 min-h-screen flex flex-col gap-5">
+
+  <header class="border-b border-rose-200 pb-3 flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <span class="text-[11px] font-mono uppercase tracking-widest text-rose-800 font-semibold">Lesson 1.1 • Interactive Lab</span>
+      <h1 class="heading-serif text-xl sm:text-2xl font-bold text-stone-900">Side-Looking Radar Geometry &amp; Terrain Distortions</h1>
+    </div>
+    <div id="regimeBadge" class="px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-900 border border-amber-300">
+      Regime: Foreshortening
+    </div>
+  </header>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+    <!-- Left 2 Cols: Dual Canvas (Cross-Section + Slant-Range Image Strip) -->
+    <div class="lg:col-span-2 bg-white rounded-2xl border border-rose-200 p-4 shadow-sm space-y-3">
+      <div class="flex items-center justify-between text-xs text-stone-600">
+        <span class="font-semibold text-stone-800">2D Orbital Cross-Section &amp; Wavefront Propagation</span>
+        <span id="geomReadout" class="mono text-rose-900 font-medium"></span>
+      </div>
+      <div class="relative w-full h-[360px] bg-[#1E1618] rounded-xl overflow-hidden">
+        <canvas id="geomCanvas" class="w-full h-full block"></canvas>
+      </div>
+      <div class="grid grid-cols-3 gap-2 pt-1 text-center text-xs">
+        <div class="p-2 rounded-lg bg-rose-50 border border-rose-200">
+          <div class="text-stone-500 text-[11px]">Slant Range Compression</div>
+          <div id="metricForeshort" class="mono font-bold text-rose-900 text-sm mt-0.5">42%</div>
+        </div>
+        <div class="p-2 rounded-lg bg-rose-50 border border-rose-200">
+          <div class="text-stone-500 text-[11px]">Ground Range Resolution (ΔRg)</div>
+          <div id="metricGroundRes" class="mono font-bold text-rose-900 text-sm mt-0.5">11.8 m</div>
+        </div>
+        <div class="p-2 rounded-lg bg-rose-50 border border-rose-200">
+          <div class="text-stone-500 text-[11px]">Back-Slope State</div>
+          <div id="metricShadow" class="mono font-bold text-stone-800 text-sm mt-0.5">Illuminated</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Col: Controls & Presets -->
+    <div class="bg-white rounded-2xl border border-rose-200 p-5 shadow-sm flex flex-col justify-between space-y-5">
+      <div class="space-y-4">
+        <h2 class="heading-serif text-base font-bold text-stone-900 border-b border-rose-100 pb-2">Geometry Controls</h2>
+
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="font-medium text-stone-700">Radar Incidence Angle (θ)</span>
+            <span id="incVal" class="mono text-rose-800 font-semibold">35°</span>
+          </div>
+          <input id="incSlider" type="range" min="18" max="60" value="35" class="w-full">
+        </div>
+
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="font-medium text-stone-700">Fore-Slope Angle (α_fore)</span>
+            <span id="foreVal" class="mono text-rose-800 font-semibold">24°</span>
+          </div>
+          <input id="foreSlider" type="range" min="5" max="65" value="24" class="w-full">
+        </div>
+
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="font-medium text-stone-700">Back-Slope Angle (α_back)</span>
+            <span id="backVal" class="mono text-rose-800 font-semibold">28°</span>
+          </div>
+          <input id="backSlider" type="range" min="5" max="75" value="28" class="w-full">
+        </div>
+
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="font-medium text-stone-700">Mountain Peak Height (H)</span>
+            <span id="heightVal" class="mono text-rose-800 font-semibold">950 m</span>
+          </div>
+          <input id="heightSlider" type="range" min="300" max="1800" value="950" class="w-full">
+        </div>
+
+        <div class="space-y-1.5 pt-2">
+          <div class="text-[11px] font-mono uppercase text-stone-400">Quick Terrain Presets</div>
+          <div class="grid grid-cols-3 gap-1.5">
+            <button id="presetGentle" class="px-2 py-1.5 rounded-lg text-xs font-medium bg-rose-50 hover:bg-rose-100 text-rose-900 border border-rose-200 transition">Foreshorten</button>
+            <button id="presetLayover" class="px-2 py-1.5 rounded-lg text-xs font-medium bg-rose-50 hover:bg-rose-100 text-rose-900 border border-rose-200 transition">Layover</button>
+            <button id="presetShadow" class="px-2 py-1.5 rounded-lg text-xs font-medium bg-rose-50 hover:bg-rose-100 text-rose-900 border border-rose-200 transition">Shadow</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="explainBox" class="p-3.5 rounded-xl bg-rose-50/70 border border-rose-200 text-xs text-stone-700 leading-relaxed">
+        <strong>Foreshortening (α &lt; θ):</strong> The mountain base A is hit first and peak B second, but the slant-range distance ΔR_AB is compressed relative to true slope length, making the fore-slope appear steep and bright.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('geomCanvas');
+    const ctx = canvas.getContext('2d');
+    let animPhase = 0;
+
+    function updateSim() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = Math.max(400, rect.width);
+      canvas.height = 360;
+      const w = canvas.width, h = canvas.height;
+
+      const thetaDeg = parseFloat(document.getElementById('incSlider').value);
+      const foreDeg = parseFloat(document.getElementById('foreSlider').value);
+      const backDeg = parseFloat(document.getElementById('backSlider').value);
+      const peakH = parseFloat(document.getElementById('heightSlider').value);
+
+      document.getElementById('incVal').textContent = thetaDeg + '°';
+      document.getElementById('foreVal').textContent = foreDeg + '°';
+      document.getElementById('backVal').textContent = backDeg + '°';
+      document.getElementById('heightVal').textContent = peakH + ' m';
+
+      const theta = thetaDeg * Math.PI / 180;
+      const alphaFore = foreDeg * Math.PI / 180;
+      const alphaBack = backDeg * Math.PI / 180;
+
+      const isLayover = foreDeg > thetaDeg;
+      const isShadow = backDeg > (90 - thetaDeg);
+
+      // Update badges & metrics
+      const badge = document.getElementById('regimeBadge');
+      const explain = document.getElementById('explainBox');
+      if (isLayover && isShadow) {
+        badge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-rose-800 text-white';
+        badge.textContent = 'Regime: Layover + Radar Shadow';
+        explain.innerHTML = '<strong>Extreme Topography (α_fore &gt; θ):</strong> Mountain peak B is closer to the satellite than base A! Echoes from the peak arrive <em>before</em> the base (inverted order), while the steep back-slope is completely hidden in dark radar shadow.';
+      } else if (isLayover) {
+        badge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-900 border border-rose-300';
+        badge.textContent = 'Regime: Radar Layover (Peak Inverted)';
+        explain.innerHTML = '<strong>Layover (α_fore &gt; θ):</strong> Because the fore-slope is steeper than the incidence angle θ, the mountain peak B is at a shorter slant range than the base A. In the SAR image, the summit folds over in front of the base.';
+      } else if (isShadow) {
+        badge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-stone-800 text-white';
+        badge.textContent = 'Regime: Foreshortening + Radar Shadow';
+        explain.innerHTML = '<strong>Radar Shadow (α_back &gt; 90° - θ):</strong> The radar beam grazes past the summit B and cannot illuminate the steep leeward slope BC, producing a zero-backscatter dark shadow zone.';
+      } else {
+        badge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-900 border border-amber-300';
+        badge.textContent = 'Regime: Foreshortening';
+        explain.innerHTML = '<strong>Foreshortening (α_fore &lt; θ):</strong> The fore-slope AB is tilted toward the radar, compressing its apparent slant-range width and concentrating backscattered energy into fewer pixels (bright slope).';
+      }
+
+      const groundRes = (7.5 / Math.sin(theta)).toFixed(1);
+      const compRatio = Math.round(Math.sin(theta - alphaFore) * 100);
+      document.getElementById('metricForeshort').textContent = (isLayover ? 'Inverted (' + compRatio + '%)' : compRatio + '% of slope');
+      document.getElementById('metricGroundRes').textContent = groundRes + ' m';
+      document.getElementById('metricShadow').textContent = isShadow ? 'In Radar Shadow' : 'Illuminated';
+      document.getElementById('geomReadout').textContent = `θ = ${thetaDeg}° | α_fore = ${foreDeg}° | Critical Layover at α > ${thetaDeg}°`;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Satellite position top-left
+      const satX = 52, satY = 42;
+      const groundY = h - 78;
+
+      // Mountain coordinates A (base left), B (peak), C (base right)
+      const mHeightPx = (peakH / 1800) * 135;
+      const peakX = w * 0.56;
+      const peakY = groundY - mHeightPx;
+      const foreRun = Math.min(w * 0.34, mHeightPx / Math.tan(alphaFore));
+      const backRun = Math.min(w * 0.34, mHeightPx / Math.tan(alphaBack));
+      const baseAX = peakX - foreRun;
+      const baseCX = peakX + backRun;
+
+      // Draw propagating spherical wavefront arcs from satellite
+      ctx.strokeStyle = 'rgba(251, 113, 133, 0.18)';
+      ctx.lineWidth = 1;
+      for (let r = 80; r < w * 1.1; r += 42) {
+        const rr = r + (animPhase % 42);
+        ctx.beginPath();
+        ctx.arc(satX, satY, rr, 0.08, 1.35);
+        ctx.stroke();
+      }
+
+      // Draw Radar Shadow zone if applicable
+      if (isShadow) {
+        const rayDX = peakX - satX;
+        const rayDY = peakY - satY;
+        const tGround = (groundY - peakY) / rayDY;
+        const shadowEndX = Math.min(w - 20, peakX + rayDX * tGround);
+
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.78)';
+        ctx.beginPath();
+        ctx.moveTo(peakX, peakY);
+        ctx.lineTo(shadowEndX, groundY);
+        ctx.lineTo(baseCX, groundY);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      // Draw Terrain Polygon
+      const grad = ctx.createLinearGradient(0, peakY, 0, groundY);
+      grad.addColorStop(0, '#9F1239');
+      grad.addColorStop(1, '#3F272C');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.moveTo(20, groundY);
+      ctx.lineTo(baseAX, groundY);
+      ctx.lineTo(peakX, peakY);
+      ctx.lineTo(baseCX, groundY);
+      ctx.lineTo(w - 20, groundY);
+      ctx.lineTo(w - 20, groundY + 12);
+      ctx.lineTo(20, groundY + 12);
+      ctx.closePath();
+      ctx.fill();
+
+      // Highlight fore-slope AB
+      ctx.strokeStyle = isLayover ? '#F43F5E' : '#FBBF24';
+      ctx.lineWidth = 3.5;
+      ctx.beginPath();
+      ctx.moveTo(baseAX, groundY);
+      ctx.lineTo(peakX, peakY);
+      ctx.stroke();
+
+      // Sight lines from Satellite to A, B, C
+      const drawRay = (tx, ty, color, label) => {
+        ctx.strokeStyle = color;
+        ctx.setLineDash([4, 4]);
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.moveTo(satX, satY);
+        ctx.lineTo(tx, ty);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(tx, ty, 4.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.font = '600 11px JetBrains Mono';
+        ctx.fillText(label, tx - 6, ty - 10);
+      };
+
+      drawRay(baseAX, groundY, '#38BDF8', 'A (Base)');
+      drawRay(peakX, peakY, '#F43F5E', 'B (Peak)');
+      drawRay(baseCX, groundY, '#A78BFA', 'C (Lee)');
+
+      // Draw Satellite Icon
+      ctx.fillStyle = '#FFE4E6';
+      ctx.fillRect(satX - 10, satY - 6, 20, 12);
+      ctx.fillStyle = '#FB7185';
+      ctx.fillRect(satX - 24, satY - 3, 12, 6);
+      ctx.fillRect(satX + 12, satY - 3, 12, 6);
+      ctx.font = '600 11px Inter';
+      ctx.fillStyle = '#FECDD3';
+      ctx.fillText(`SAR Sensor (θ=${thetaDeg}°)`, satX + 30, satY + 4);
+
+      // Bottom Strip: 1D Slant-Range Image Projection Bar
+      const barY = h - 38;
+      ctx.fillStyle = '#2D2124';
+      ctx.fillRect(30, barY, w - 60, 22);
+      ctx.font = '500 10px JetBrains Mono';
+      ctx.fillStyle = '#D6C7CA';
+      ctx.fillText('1D SLANT-RANGE IMAGE ORDER:', 38, barY - 6);
+
+      // Compute slant ranges from satellite
+      const distA = Math.hypot(baseAX - satX, groundY - satY);
+      const distB = Math.hypot(peakX - satX, peakY - satY);
+      const distC = Math.hypot(baseCX - satX, groundY - satY);
+      const minD = Math.min(distA, distB) - 30;
+      const maxD = distC + 40;
+      const mapX = (d) => 45 + ((d - minD) / (maxD - minD)) * (w - 90);
+
+      const xA = mapX(distA), xB = mapX(distB), xC = mapX(distC);
+
+      // Highlight foreshortened/layover region on bar
+      ctx.fillStyle = isLayover ? 'rgba(244, 63, 94, 0.55)' : 'rgba(251, 191, 36, 0.45)';
+      ctx.fillRect(Math.min(xA, xB), barY + 2, Math.abs(xB - xA), 18);
+
+      if (isShadow) {
+        ctx.fillStyle = '#09090B';
+        ctx.fillRect(xB, barY + 2, Math.max(10, xC - xB), 18);
+      }
+
+      const drawMarker = (mx, col, lbl) => {
+        ctx.fillStyle = col;
+        ctx.beginPath();
+        ctx.arc(mx, barY + 11, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillText(lbl, mx - 4, barY + 33);
+      };
+      drawMarker(xA, '#38BDF8', 'A');
+      drawMarker(xB, '#F43F5E', 'B');
+      drawMarker(xC, '#A78BFA', 'C');
+    }
+
+    ['incSlider', 'foreSlider', 'backSlider', 'heightSlider'].forEach(id => {
+      document.getElementById(id).addEventListener('input', updateSim);
+    });
+
+    document.getElementById('presetGentle').addEventListener('click', () => {
+      document.getElementById('incSlider').value = 40;
+      document.getElementById('foreSlider').value = 25;
+      document.getElementById('backSlider').value = 25;
+      updateSim();
+    });
+    document.getElementById('presetLayover').addEventListener('click', () => {
+      document.getElementById('incSlider').value = 28;
+      document.getElementById('foreSlider').value = 48;
+      document.getElementById('backSlider').value = 30;
+      updateSim();
+    });
+    document.getElementById('presetShadow').addEventListener('click', () => {
+      document.getElementById('incSlider').value = 45;
+      document.getElementById('foreSlider').value = 26;
+      document.getElementById('backSlider').value = 58;
+      updateSim();
+    });
+
+    window.addEventListener('resize', updateSim);
+    setInterval(() => { animPhase += 1.2; updateSim(); }, 50);
+    updateSim();
+  </script>
+</body>
+</html>

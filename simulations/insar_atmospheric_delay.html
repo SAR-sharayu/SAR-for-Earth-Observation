@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>5.3 Atmospheric Phase Screen (APS) & Tropospheric Delays</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #FAF7F5; color: #291D20; }
+    .heading-serif { font-family: 'Playfair Display', 'Times New Roman', serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    input[type="range"] { accent-color: #9F1239; }
+  </style>
+</head>
+<body class="p-4 sm:p-6 min-h-screen flex flex-col gap-5">
+
+  <header class="border-b border-rose-200 pb-3 flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <span class="text-[11px] font-mono uppercase tracking-widest text-rose-800 font-semibold">Lesson 5.3 • Interactive Lab</span>
+      <h1 class="heading-serif text-xl sm:text-2xl font-bold text-stone-900">Atmospheric Phase Screen (APS) vs. Volcanic Deformation</h1>
+    </div>
+    <div id="apsBadge" class="px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-900 border border-amber-300">
+      Separating Stratified Troposphere from Magma Uplift
+    </div>
+  </header>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+    <div class="lg:col-span-2 bg-white rounded-2xl border border-rose-200 p-4 shadow-sm space-y-3">
+      <div class="flex items-center justify-between text-xs text-stone-600">
+        <span class="font-semibold text-stone-800">Left: Observed Interferogram • Right: Phase vs. Elevation h(x,y) Scatter</span>
+        <span id="apsReadout" class="mono text-rose-900 font-medium"></span>
+      </div>
+      <div class="relative w-full h-[360px] bg-[#1E1618] rounded-xl overflow-hidden">
+        <canvas id="apsCanvas" class="w-full h-full block"></canvas>
+      </div>
+      <div class="grid grid-cols-3 gap-2 pt-1 text-center text-xs">
+        <div class="p-2 rounded-lg bg-rose-50 border border-rose-200">
+          <div class="text-stone-500 text-[11px]">True Deformation Signal</div>
+          <div id="defOut" class="mono font-bold text-emerald-800 text-sm mt-0.5">4.5 cm</div>
+        </div>
+        <div class="p-2 rounded-lg bg-rose-50 border border-rose-200">
+          <div class="text-stone-500 text-[11px]">Residual Atmospheric RMS</div>
+          <div id="apsRmsOut" class="mono font-bold text-rose-900 text-sm mt-0.5">1.8 cm</div>
+        </div>
+        <div class="p-2 rounded-lg bg-rose-50 border border-rose-200">
+          <div class="text-stone-500 text-[11px]">Stacking √N Noise Reduction</div>
+          <div id="stackGainOut" class="mono font-bold text-stone-800 text-sm mt-0.5">1.0× (Single Pair)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-rose-200 p-5 shadow-sm flex flex-col justify-between space-y-4">
+      <div class="space-y-4">
+        <h2 class="heading-serif text-base font-bold text-stone-900 border-b border-rose-100 pb-2">Atmospheric &amp; Stacking Controls</h2>
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="font-medium text-stone-700">Volcanic Magma Uplift (cm)</span>
+            <span id="upliftVal" class="mono text-rose-800 font-semibold">4.5 cm</span>
+          </div>
+          <input id="upliftSlider" type="range" min="0" max="10" step="0.5" value="4.5" class="w-full">
+        </div>
+
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="font-medium text-stone-700">Stratified Tropospheric Delay (K_z)</span>
+            <span id="stratVal" class="mono text-rose-800 font-semibold">3.5 cm/km</span>
+          </div>
+          <input id="stratSlider" type="range" min="0" max="8" step="0.5" value="3.5" class="w-full">
+        </div>
+
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="font-medium text-stone-700">Turbulent Water Vapor Clouds</span>
+            <span id="turbVal" class="mono text-rose-800 font-semibold">2.5 cm</span>
+          </div>
+          <input id="turbSlider" type="range" min="0" max="6" step="0.5" value="2.5" class="w-full">
+        </div>
+
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="font-medium text-stone-700">Number of Stacked Pairs (N)</span>
+            <span id="stackVal" class="mono text-rose-800 font-semibold">1 pair</span>
+          </div>
+          <input id="stackSlider" type="range" min="1" max="25" value="1" class="w-full">
+        </div>
+      </div>
+
+      <div class="p-3.5 rounded-xl bg-rose-50/70 border border-rose-200 text-xs text-stone-700 leading-relaxed">
+        <strong>Key Insight:</strong> Stratified tropospheric water vapor scales with volcano elevation <span class="mono">h(x,y)</span>, producing concentric rings that mimic magma inflation! Stacking <span class="mono">N</span> independent interferograms suppresses random atmospheric turbulence by <span class="mono">1/√N</span>.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('apsCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function drawAPS() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = Math.max(400, rect.width);
+      canvas.height = 360;
+      const w = canvas.width, h = canvas.height;
+
+      const uplift = parseFloat(document.getElementById('upliftSlider').value);
+      const strat = parseFloat(document.getElementById('stratSlider').value);
+      const turb = parseFloat(document.getElementById('turbSlider').value);
+      const nStack = parseInt(document.getElementById('stackSlider').value, 10);
+
+      document.getElementById('upliftVal').textContent = uplift.toFixed(1) + ' cm';
+      document.getElementById('stratVal').textContent = strat.toFixed(1) + ' cm/km';
+      document.getElementById('turbVal').textContent = turb.toFixed(1) + ' cm';
+      document.getElementById('stackVal').textContent = nStack + (nStack === 1 ? ' pair' : ' pairs');
+
+      const sqrtN = Math.sqrt(nStack);
+      const effStrat = strat / sqrtN;
+      const effTurb = turb / sqrtN;
+      const totAps = Math.hypot(effStrat * 0.7, effTurb * 0.6);
+
+      document.getElementById('defOut').textContent = uplift.toFixed(1) + ' cm';
+      document.getElementById('apsRmsOut').textContent = totAps.toFixed(2) + ' cm';
+      document.getElementById('stackGainOut').textContent = sqrtN.toFixed(2) + '× SNR gain';
+      document.getElementById('apsReadout').textContent = `φ_obs = φ_def + K_z·h(x,y) + φ_turb / √${nStack}`;
+
+      ctx.clearRect(0, 0, w, h);
+
+      const boxW = (w - 48) / 2;
+      const boxH = 290;
+      const leftX = 16, rightX = 32 + boxW, topY = 38;
+
+      ctx.font = '600 11px JetBrains Mono';
+      ctx.fillStyle = '#FECDD3';
+      ctx.fillText('1. STACKED INTERFEROGRAM OVER VOLCANO', leftX, 24);
+      ctx.fillStyle = '#38BDF8';
+      ctx.fillText('2. PHASE vs. ELEVATION REGRESSION', rightX, 24);
+
+      const step = 5;
+      for (let py = 0; py < boxH; py += step) {
+        for (let px = 0; px < boxW; px += step) {
+          const nx = (px - boxW / 2) / (boxW / 2);
+          const ny = (py - boxH / 2) / (boxH / 2);
+          const r2 = nx * nx + ny * ny;
+          const elevKm = 2.2 * Math.exp(-r2 * 2.5); // 2.2 km volcano cone
+          const defCm = uplift * Math.exp(-r2 * 4.0);
+          const cloudCm = effTurb * (Math.sin(nx * 4.5 + ny * 3.2) * Math.cos(nx * 2.1 - ny * 5.0));
+          const totalCm = defCm + effStrat * elevKm + cloudCm;
+
+          const phaseRad = (totalCm / 2.8) * 2 * Math.PI;
+          const wrapped = (((phaseRad + Math.PI) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
+          const hue = ((wrapped + Math.PI) / (2 * Math.PI)) * 360;
+          ctx.fillStyle = `hsl(${hue}, 82%, 55%)`;
+          ctx.fillRect(leftX + px, topY + py, step, step);
+        }
+      }
+
+      // Right Plot: Scatter of Total Delay vs Elevation h
+      ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+      ctx.strokeRect(rightX, topY, boxW, boxH);
+
+      for (let i = 0; i < 120; i++) {
+        const elev = (i / 120) * 2.2; // 0 to 2.2 km
+        const noise = Math.sin(i * 7.3) * effTurb * 0.7;
+        const defPart = uplift * Math.pow(elev / 2.2, 1.6);
+        const totDelay = effStrat * elev + defPart + noise;
+
+        const sx = rightX + 18 + (elev / 2.3) * (boxW - 36);
+        const sy = topY + boxH - 25 - (totDelay / 22) * (boxH - 50);
+        ctx.fillStyle = '#38BDF8';
+        ctx.beginPath(); ctx.arc(sx, Math.max(topY + 10, Math.min(topY + boxH - 10, sy)), 2.5, 0, Math.PI * 2); ctx.fill();
+      }
+
+      // Draw Stratified Linear Fit Line
+      ctx.strokeStyle = '#F43F5E';
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      ctx.moveTo(rightX + 18, topY + boxH - 25);
+      const topFitY = topY + boxH - 25 - ((effStrat * 2.2) / 22) * (boxH - 50);
+      ctx.lineTo(rightX + boxW - 18, Math.max(topY + 12, topFitY));
+      ctx.stroke();
+
+      ctx.fillStyle = '#FDA4AF';
+      ctx.fillText(`Stratified APS Slope = ${effStrat.toFixed(2)} cm/km`, rightX + 14, topY + 22);
+      ctx.fillStyle = '#9CA3AF';
+      ctx.fillText('Elevation h (0 → 2.2 km)', rightX + boxW / 2 - 65, topY + boxH - 6);
+    }
+
+    ['upliftSlider', 'stratSlider', 'turbSlider', 'stackSlider'].forEach(id => {
+      document.getElementById(id).addEventListener('input', drawAPS);
+    });
+    window.addEventListener('resize', drawAPS);
+    drawAPS();
+  </script>
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2.4 Radiometric Calibration & Terrain Flattening (RTC)</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #FAF7F5; color: #291D20; }
+    .heading-serif { font-family: 'Playfair Display', 'Times New Roman', serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    input[type="range"] { accent-color: #9F1239; }
+  </style>
+</head>
+<body class="p-4 sm:p-6 min-h-screen flex flex-col gap-5">
+
+  <header class="border-b border-rose-200 pb-3 flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <span class="text-[11px] font-mono uppercase tracking-widest text-rose-800 font-semibold">Lesson 2.4 • Interactive Lab</span>
+      <h1 class="heading-serif text-xl sm:text-2xl font-bold text-stone-900">Radiometric Calibration &amp; Terrain Flattening (β⁰, σ⁰, γ⁰_RTC)</h1>
+    </div>
+    <div id="rtcModeBadge" class="px-3 py-1 rounded-full text-xs font-semibold bg-rose-800 text-white">
+      Active Convention: Terrain-Flattened γ⁰_RTC
+    </div>
+  </header>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+    <div class="lg:col-span-2 bg-white rounded-2xl border border-rose-200 p-4 shadow-sm space-y-3">
+      <div class="flex items-center justify-between text-xs text-stone-600">
+        <span class="font-semibold text-stone-800">Hillside Backscatter Profile: Unflattened vs. DEM Terrain-Flattened</span>
+        <span id="rtcReadout" class="mono text-rose-900 font-medium"></span>
+      </div>
+      <div class="relative w-full h-[360px] bg-[#1E1618] rounded-xl overflow-hidden">
+        <canvas id="rtcCanvas" class="w-full h-full block"></canvas>
+      </div>
+      <div class="grid grid-cols-3 gap-2 pt-1 text-center text-xs">
+        <div class="p-2 rounded-lg bg-rose-50 border border-rose-200">
+          <div class="text-stone-500 text-[11px]">Slant-Range Beta (β⁰)</div>
+          <div id="betaOut" class="mono font-bold text-stone-800 text-sm mt-0.5">-6.2 dB</div>
+        </div>
+        <div class="p-2 rounded-lg bg-rose-50 border border-rose-200">
+          <div class="text-stone-500 text-[11px]">Ellipsoid Sigma (σ⁰)</div>
+          <div id="sigmaOut" class="mono font-bold text-amber-800 text-sm mt-0.5">-8.9 dB</div>
+        </div>
+        <div class="p-2 rounded-lg bg-rose-50 border border-rose-200">
+          <div class="text-stone-500 text-[11px]">Terrain-Flattened (γ⁰_RTC)</div>
+          <div id="gammaOut" class="mono font-bold text-emerald-800 text-sm mt-0.5">-11.0 dB</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-rose-200 p-5 shadow-sm flex flex-col justify-between space-y-4">
+      <div class="space-y-4">
+        <h2 class="heading-serif text-base font-bold text-stone-900 border-b border-rose-100 pb-2">Calibration Controls</h2>
+        <div class="grid grid-cols-3 gap-1.5">
+          <button data-conv="beta" class="conv-btn px-2 py-1.5 rounded-lg text-xs font-medium bg-rose-50 text-rose-900 border border-rose-200">β⁰ (Slant)</button>
+          <button data-conv="sigma" class="conv-btn px-2 py-1.5 rounded-lg text-xs font-medium bg-rose-50 text-rose-900 border border-rose-200">σ⁰ (Ellipsoid)</button>
+          <button data-conv="gamma" class="conv-btn px-2 py-1.5 rounded-lg text-xs font-semibold bg-rose-800 text-white">γ⁰ (RTC)</button>
+        </div>
+
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="font-medium text-stone-700">Hillside Steepness (α)</span>
+            <span id="slopeVal" class="mono text-rose-800 font-semibold">26°</span>
+          </div>
+          <input id="slopeSlider" type="range" min="2" max="38" value="26" class="w-full">
+        </div>
+
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="font-medium text-stone-700">Nominal Incidence Angle (θ₀)</span>
+            <span id="thetaVal" class="mono text-rose-800 font-semibold">38°</span>
+          </div>
+          <input id="thetaSlider" type="range" min="25" max="50" value="38" class="w-full">
+        </div>
+
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="font-medium text-stone-700">True Forest Backscatter (γ⁰_true)</span>
+            <span id="trueVal" class="mono text-rose-800 font-semibold">-11.0 dB</span>
+          </div>
+          <input id="trueSlider" type="range" min="-18" max="-5" step="0.5" value="-11" class="w-full">
+        </div>
+      </div>
+
+      <div class="p-3.5 rounded-xl bg-rose-50/70 border border-rose-200 text-xs text-stone-700 leading-relaxed">
+        <strong>Why RTC Matters:</strong> Without DEM terrain flattening, a uniform forest on a slope facing the radar appears +5 to +9 dB brighter in <span class="mono">σ⁰</span> than the exact same forest on the back slope. <span class="mono">γ⁰_RTC</span> normalizes by true DEM facet area.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('rtcCanvas');
+    const ctx = canvas.getContext('2d');
+    let activeConv = 'gamma';
+
+    function drawRTC() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = Math.max(400, rect.width);
+      canvas.height = 360;
+      const w = canvas.width, h = canvas.height;
+
+      const slopeDeg = parseFloat(document.getElementById('slopeSlider').value);
+      const thetaDeg = parseFloat(document.getElementById('thetaSlider').value);
+      const trueDb = parseFloat(document.getElementById('trueSlider').value);
+
+      document.getElementById('slopeVal').textContent = slopeDeg + '°';
+      document.getElementById('thetaVal').textContent = thetaDeg + '°';
+      document.getElementById('trueVal').textContent = trueDb.toFixed(1) + ' dB';
+
+      const theta0 = thetaDeg * Math.PI / 180;
+      const alpha = slopeDeg * Math.PI / 180;
+      const thetaLoc = Math.max(0.08, theta0 - alpha);
+
+      // Fore-slope values
+      const gammaFore = trueDb;
+      const sigmaFore = trueDb + 10 * Math.log10(Math.sin(theta0) / Math.sin(thetaLoc) * Math.cos(thetaLoc));
+      const betaFore = sigmaFore - 10 * Math.log10(Math.sin(theta0));
+
+      document.getElementById('betaOut').textContent = betaFore.toFixed(1) + ' dB';
+      document.getElementById('sigmaOut').textContent = sigmaFore.toFixed(1) + ' dB';
+      document.getElementById('gammaOut').textContent = gammaFore.toFixed(1) + ' dB';
+      document.getElementById('rtcReadout').textContent = `Local Incidence θ_loc = ${(thetaDeg - slopeDeg)}° (Fore) vs. ${(thetaDeg + slopeDeg)}° (Back)`;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Top Half: Backscatter dB Curves across Mountain
+      ctx.font = '600 11px JetBrains Mono';
+      ctx.fillStyle = '#E5E7EB';
+      ctx.fillText('BACKSCATTER INTENSITY PROFILE ACROSS UNIFORM FORESTED RIDGE (dB)', 18, 24);
+
+      const drawProfile = (mode, col, lw) => {
+        ctx.strokeStyle = col;
+        ctx.lineWidth = lw;
+        ctx.beginPath();
+        for (let x = 30; x < w - 30; x++) {
+          const u = ((x - w / 2) / (w * 0.28));
+          // Mountain derivative (slope)
+          const localSlope = -alpha * u * Math.exp(-u * u);
+          const locInc = Math.max(0.1, theta0 - localSlope);
+          let valDb = trueDb;
+          if (mode === 'sigma') {
+            valDb = trueDb + 10 * Math.log10(Math.sin(theta0) / Math.sin(locInc));
+          } else if (mode === 'beta') {
+            valDb = trueDb + 10 * Math.log10(1 / Math.sin(locInc));
+          }
+          const py = 125 - (valDb - trueDb) * 7.5;
+          if (x === 30) ctx.moveTo(x, py); else ctx.lineTo(x, py);
+        }
+        ctx.stroke();
+      };
+
+      drawProfile('beta', 'rgba(244, 63, 94, 0.55)', activeConv === 'beta' ? 3 : 1.5);
+      drawProfile('sigma', 'rgba(251, 191, 36, 0.75)', activeConv === 'sigma' ? 3 : 1.5);
+      drawProfile('gamma', '#34D399', activeConv === 'gamma' ? 3.2 : 1.8);
+
+      // Legend
+      ctx.fillStyle = '#F43F5E'; ctx.fillText('— β⁰ (Slant Area)', 25, 175);
+      ctx.fillStyle = '#FBBF24'; ctx.fillText('— σ⁰ (Ellipsoid Area)', 170, 175);
+      ctx.fillStyle = '#34D399'; ctx.fillText('— γ⁰_RTC (DEM Flattened)', 340, 175);
+
+      // Bottom Half: Simulated Mountain Cross-Section Shaded by Active Convention
+      const baseY = h - 22;
+      for (let x = 30; x < w - 30; x += 4) {
+        const u = ((x - w / 2) / (w * 0.28));
+        const elev = Math.exp(-u * u) * (slopeDeg * 2.6);
+        const localSlope = -alpha * u * Math.exp(-u * u);
+        const locInc = Math.max(0.1, theta0 - localSlope);
+        let boost = 0;
+        if (activeConv === 'sigma') boost = (theta0 - locInc) * 95;
+        if (activeConv === 'beta') boost = (theta0 - locInc) * 130 + 20;
+
+        const lum = Math.max(20, Math.min(88, 50 + boost));
+        ctx.fillStyle = `hsl(152, 42%, ${lum}%)`;
+        ctx.fillRect(x, baseY - elev, 4, elev);
+      }
+    }
+
+    document.querySelectorAll('.conv-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeConv = btn.getAttribute('data-conv');
+        document.querySelectorAll('.conv-btn').forEach(b => {
+          const act = b.getAttribute('data-conv') === activeConv;
+          b.className = 'conv-btn px-2 py-1.5 rounded-lg text-xs ' +
+            (act ? 'font-semibold bg-rose-800 text-white' : 'font-medium bg-rose-50 text-rose-900 border border-rose-200');
+        });
+        const labels = { beta: 'Slant-Range Beta β⁰', sigma: 'Ellipsoid Sigma σ⁰', gamma: 'Terrain-Flattened γ⁰_RTC' };
+        document.getElementById('rtcModeBadge').textContent = 'Active Convention: ' + labels[activeConv];
+        drawRTC();
+      });
+    });
+
+    ['slopeSlider', 'thetaSlider', 'trueSlider'].forEach(id => {
+      document.getElementById(id).addEventListener('input', drawRTC);
+    });
+    window.addEventListener('resize', drawRTC);
+    drawRTC();
+  </script>
+</body>
+</html>

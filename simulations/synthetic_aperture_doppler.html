@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1.4 Doppler History & Synthetic Aperture Focusing</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #FAF7F5; color: #291D20; }
+    .heading-serif { font-family: 'Playfair Display', 'Times New Roman', serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    input[type="range"] { accent-color: #9F1239; }
+  </style>
+</head>
+<body class="p-4 sm:p-6 min-h-screen flex flex-col gap-5">
+
+  <header class="border-b border-rose-200 pb-3 flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <span class="text-[11px] font-mono uppercase tracking-widest text-rose-800 font-semibold">Lesson 1.4 • Interactive Lab</span>
+      <h1 class="heading-serif text-xl sm:text-2xl font-bold text-stone-900">Doppler History &amp; Synthetic Aperture Azimuth Focusing</h1>
+    </div>
+    <div class="px-3 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-900 border border-rose-200">
+      Theoretical Azimuth Resolution: δ_az = L_ant / 2
+    </div>
+  </header>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+    <div class="lg:col-span-2 bg-white rounded-2xl border border-rose-200 p-4 shadow-sm space-y-3">
+      <div class="flex items-center justify-between text-xs text-stone-600">
+        <span class="font-semibold text-stone-800">Along-Track Flight Path, Range Cell Migration &amp; Doppler Chirp</span>
+        <span id="dopplerReadout" class="mono text-rose-900 font-medium"></span>
+      </div>
+      <div class="relative w-full h-[360px] bg-[#1E1618] rounded-xl overflow-hidden">
+        <canvas id="dopplerCanvas" class="w-full h-full block"></canvas>
+      </div>
+      <div class="grid grid-cols-3 gap-2 pt-1 text-center text-xs">
+        <div class="p-2 rounded-lg bg-rose-50 border border-rose-200">
+          <div class="text-stone-500 text-[11px]">Focused Azimuth Resolution (δ_az)</div>
+          <div id="azResOut" class="mono font-bold text-rose-900 text-sm mt-0.5">5.0 m</div>
+        </div>
+        <div class="p-2 rounded-lg bg-rose-50 border border-rose-200">
+          <div class="text-stone-500 text-[11px]">Synthetic Aperture Length (L_sa)</div>
+          <div id="lsaOut" class="mono font-bold text-rose-900 text-sm mt-0.5">4.48 km</div>
+        </div>
+        <div class="p-2 rounded-lg bg-rose-50 border border-rose-200">
+          <div class="text-stone-500 text-[11px]">Instantaneous Doppler (f_D)</div>
+          <div id="instDopOut" class="mono font-bold text-stone-800 text-sm mt-0.5">+0 Hz</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-rose-200 p-5 shadow-sm flex flex-col justify-between space-y-4">
+      <div class="space-y-4">
+        <h2 class="heading-serif text-base font-bold text-stone-900 border-b border-rose-100 pb-2">Synthetic Aperture Controls</h2>
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="font-medium text-stone-700">Along-Track Satellite Position (η)</span>
+            <span id="posVal" class="mono text-rose-800 font-semibold">0.0 s</span>
+          </div>
+          <input id="posSlider" type="range" min="-50" max="50" value="-25" class="w-full">
+        </div>
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="font-medium text-stone-700">Physical Antenna Length (L_ant)</span>
+            <span id="antVal" class="mono text-rose-800 font-semibold">10.0 m</span>
+          </div>
+          <input id="antSlider" type="range" min="4" max="20" step="0.5" value="10" class="w-full">
+        </div>
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="font-medium text-stone-700">Slant Range Altitude (R₀)</span>
+            <span id="altVal" class="mono text-rose-800 font-semibold">800 km</span>
+          </div>
+          <input id="altSlider" type="range" min="500" max="1200" step="50" value="800" class="w-full">
+        </div>
+        <div class="pt-1">
+          <button id="togglePlayBtn" class="w-full py-2 rounded-xl text-xs font-semibold bg-rose-800 hover:bg-rose-900 text-white transition">
+            Pause Along-Track Pass
+          </button>
+        </div>
+      </div>
+
+      <div class="p-3.5 rounded-xl bg-rose-50/70 border border-rose-200 text-xs text-stone-700 leading-relaxed">
+        <strong>Why Smaller Antennas Resolve Finer Detail:</strong> A shorter antenna <span class="mono">L_ant</span> has a wider beam footprint (<span class="mono">L_sa = λ·R₀/L_ant</span>), illuminating the target longer and producing a wider Doppler bandwidth that compresses to <span class="mono">δ_az = L_ant / 2</span>.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('dopplerCanvas');
+    const ctx = canvas.getContext('2d');
+    let playing = true;
+
+    function drawDoppler() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = Math.max(400, rect.width);
+      canvas.height = 360;
+      const w = canvas.width, h = canvas.height;
+
+      const pos = parseFloat(document.getElementById('posSlider').value) / 50; // -1 to +1
+      const lant = parseFloat(document.getElementById('antSlider').value);
+      const r0 = parseFloat(document.getElementById('altSlider').value);
+
+      const lambda = 0.056; // C-band
+      const lsaKm = ((lambda * r0) / lant).toFixed(2);
+      const daz = (lant / 2).toFixed(2);
+      const fd = Math.round(-pos * (15000 / lant));
+
+      document.getElementById('posVal').textContent = (pos * 0.6).toFixed(2) + ' s';
+      document.getElementById('antVal').textContent = lant.toFixed(1) + ' m';
+      document.getElementById('altVal').textContent = r0 + ' km';
+      document.getElementById('azResOut').textContent = daz + ' m';
+      document.getElementById('lsaOut').textContent = lsaKm + ' km';
+      document.getElementById('instDopOut').textContent = (fd >= 0 ? '+' : '') + fd + ' Hz';
+      document.getElementById('dopplerReadout').textContent = `R(η) ≈ R₀ + (v²η²)/(2R₀) | Doppler Chirp Slope K_a < 0`;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Top Half: Satellite Flying Past Point Target
+      const trackY = 38;
+      const targetX = w / 2, targetY = 152;
+      const beamSpanPx = Math.min(w * 0.78, (22 / lant) * (r0 / 800) * 145);
+      const satX = targetX + pos * (beamSpanPx / 2);
+
+      // Synthetic aperture bar
+      ctx.strokeStyle = 'rgba(251, 113, 133, 0.45)';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(targetX - beamSpanPx / 2, trackY);
+      ctx.lineTo(targetX + beamSpanPx / 2, trackY);
+      ctx.stroke();
+
+      // Radar beam cone from satellite
+      ctx.fillStyle = pos < 0 ? 'rgba(56, 189, 248, 0.14)' : 'rgba(244, 63, 94, 0.14)';
+      ctx.beginPath();
+      ctx.moveTo(satX, trackY);
+      ctx.lineTo(satX - beamSpanPx * 0.35, targetY);
+      ctx.lineTo(satX + beamSpanPx * 0.35, targetY);
+      ctx.closePath();
+      ctx.fill();
+
+      // Line of sight to target
+      ctx.strokeStyle = pos < 0 ? '#38BDF8' : '#FB7185';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(satX, trackY);
+      ctx.lineTo(targetX, targetY);
+      ctx.stroke();
+
+      // Target & Satellite icons
+      ctx.fillStyle = '#34D399';
+      ctx.beginPath(); ctx.arc(targetX, targetY, 6, 0, Math.PI * 2); ctx.fill();
+      ctx.font = '600 11px JetBrains Mono';
+      ctx.fillText('Point Target P₀', targetX - 42, targetY + 18);
+
+      ctx.fillStyle = '#FFF1F2';
+      ctx.fillRect(satX - 10, trackY - 6, 20, 12);
+      ctx.fillStyle = '#FDA4AF';
+      ctx.fillText(`L_sa = ${lsaKm} km`, targetX - 38, trackY - 12);
+
+      // Bottom Half: Hyperbolic Range Migration R(t) & Linear Doppler Frequency f_D(t)
+      const plotTop = 195, plotBot = h - 25;
+      const plotL = 45, plotR = w - 45;
+      ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+      ctx.strokeRect(plotL, plotTop, plotR - plotL, plotBot - plotTop);
+
+      // Plot quadratic Range Cell Migration R(t)
+      ctx.strokeStyle = '#FBBF24';
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      for (let x = plotL; x <= plotR; x++) {
+        const u = ((x - plotL) / (plotR - plotL)) * 2 - 1; // -1 to 1
+        const rcm = u * u;
+        const py = plotTop + 22 + rcm * (plotBot - plotTop - 45);
+        if (x === plotL) ctx.moveTo(x, py); else ctx.lineTo(x, py);
+      }
+      ctx.stroke();
+
+      // Plot Linear Doppler Frequency f_D(t)
+      ctx.strokeStyle = '#38BDF8';
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      for (let x = plotL; x <= plotR; x++) {
+        const u = ((x - plotL) / (plotR - plotL)) * 2 - 1;
+        const py = (plotTop + plotBot) / 2 + u * ((plotBot - plotTop) * 0.38);
+        if (x === plotL) ctx.moveTo(x, py); else ctx.lineTo(x, py);
+      }
+      ctx.stroke();
+
+      // Current time cursor on curves
+      const curX = plotL + ((pos + 1) / 2) * (plotR - plotL);
+      ctx.strokeStyle = '#F43F5E';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(curX, plotTop); ctx.lineTo(curX, plotBot); ctx.stroke();
+
+      ctx.fillStyle = '#FBBF24';
+      ctx.fillText('Quadratic Slant Range R(η)', plotL + 10, plotTop + 16);
+      ctx.fillStyle = '#38BDF8';
+      ctx.fillText('Linear Doppler Frequency f_D(η)', plotR - 210, plotTop + 16);
+    }
+
+    ['posSlider', 'antSlider', 'altSlider'].forEach(id => {
+      document.getElementById(id).addEventListener('input', drawDoppler);
+    });
+    document.getElementById('togglePlayBtn').addEventListener('click', (e) => {
+      playing = !playing;
+      e.currentTarget.textContent = playing ? 'Pause Along-Track Pass' : 'Resume Along-Track Pass';
+    });
+
+    setInterval(() => {
+      if (playing) {
+        const s = document.getElementById('posSlider');
+        let v = parseFloat(s.value) + 1;
+        if (v > 50) v = -50;
+        s.value = v;
+        drawDoppler();
+      }
+    }, 55);
+
+    window.addEventListener('resize', drawDoppler);
+    drawDoppler();
+  </script>
+</body>
+</html>
